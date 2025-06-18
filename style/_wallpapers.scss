@@ -1,0 +1,16 @@
+@use "palette";
+@use "abstracts/looks";
+@use "abstracts/fonts";
+
+.wallpaper-picker {
+  @include fonts.font-size;
+
+  scrolledwindow {
+    padding: 1rem;
+    background-color: palette.$base;
+  }
+
+  button {
+    padding: 1rem;
+  }
+}
