@@ -1,6 +1,7 @@
 import { bind } from "astal";
 import { Gtk, hook } from "astal/gtk4";
 import Network from "gi://AstalNetwork";
+import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
 
 const network = Network.get_default();
@@ -37,7 +38,7 @@ const Current = (
 );
 
 export default (
-  <popover cssClasses={["network-popover"]} hasArrow={false}>
+  <PopRevealer cssClasses={["network-popover"]} hasArrow={false}>
     <box vertical>{Current}</box>
-  </popover>
+  </PopRevealer>
 ) as Gtk.Popover;

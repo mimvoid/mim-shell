@@ -3,8 +3,9 @@ import { Gtk, hook } from "astal/gtk4";
 import Bluetooth from "gi://AstalBluetooth";
 
 import Icon from "@lib/icons";
-import { connectedDevices, disconnectedDevices } from "./bluetooth/DeviceItem";
+import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
+import { connectedDevices, disconnectedDevices } from "./bluetooth/DeviceItem";
 
 const bluetooth = Bluetooth.get_default();
 const { START, CENTER } = Gtk.Align;
@@ -82,11 +83,11 @@ const Disconnected = (
 );
 
 export default (
-  <popover cssClasses={["bluetooth-popover"]} hasArrow={false}>
+  <PopRevealer cssClasses={["bluetooth-popover"]} hasArrow={false}>
     <box vertical>
       <Status />
       <Connected />
       {Disconnected}
     </box>
-  </popover>
+  </PopRevealer>
 );

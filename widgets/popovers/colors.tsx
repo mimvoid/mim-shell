@@ -1,8 +1,9 @@
 import PickerList from "./colors/PickerList";
 import Converter from "./colors/Converter";
+import PopRevealer from "@lib/widgets/PopRevealer";
 
 export default (
-  <popover
+  <PopRevealer
     cssClasses={["colors-popover"]}
     name="colorsPopover"
     hasArrow={false}
@@ -11,5 +12,5 @@ export default (
       <Converter />
       <PickerList />
     </box>
-  </popover>
+  </PopRevealer>
 );

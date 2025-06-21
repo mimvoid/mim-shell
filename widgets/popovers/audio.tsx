@@ -2,6 +2,7 @@ import { bind } from "astal";
 import { Gtk, hook } from "astal/gtk4";
 import Wp from "gi://AstalWp";
 import { pointer, popButton, drawValuePercentage } from "@lib/utils";
+import PopRevealer from "@lib/widgets/PopRevealer";
 
 const { START, CENTER, FILL } = Gtk.Align;
 
@@ -85,10 +86,10 @@ const Speaker = Section(speaker, "Speaker");
 const Microphone = Section(microphone, "Microphone");
 
 export default (
-  <popover cssClasses={["audio-popover"]} hasArrow={false}>
+  <PopRevealer cssClasses={["audio-popover"]} hasArrow={false}>
     <box vertical>
       {Speaker}
       {Microphone}
     </box>
-  </popover>
+  </PopRevealer>
 );

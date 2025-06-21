@@ -1,6 +1,7 @@
 import { Gtk } from "astal/gtk4";
 
 import { name } from "@lib/variables";
+import PopRevealer from "@lib/widgets/PopRevealer";
 
 import Toggles from "./dashboard/toggles";
 import Launchers from "./dashboard/launchers";
@@ -32,11 +33,11 @@ function User() {
 }
 
 export default (
-  <popover name="dashboard" cssClasses={["dashboard"]} hasArrow={false}>
+  <PopRevealer name="dashboard" cssClasses={["dashboard"]} hasArrow={false}>
     <box vertical>
       <User />
       <Toggles />
       <Launchers />
     </box>
-  </popover>
+  </PopRevealer>
 );
