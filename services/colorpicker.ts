@@ -1,4 +1,4 @@
-import { execAsync, readFile, writeFileAsync } from "astal";
+import { execAsync, readFile, subprocess, writeFileAsync } from "astal";
 import GObject, { register, property } from "astal/gobject";
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib";
@@ -38,13 +38,7 @@ export default class Colorpicker extends GObject.Object {
   set colors(colors) {
     this.#colors = colors;
     this.notify("colors");
-    this.notify("lastColor");
     this.updateCache();
-  }
-
-  @property(String)
-  get lastColor() {
-    return this.colors.at(-1) || "#000000";
   }
 
   private async updateCache() {
@@ -54,16 +48,17 @@ export default class Colorpicker extends GObject.Object {
     ).catch(console.error);
   }
 
-  async pick() {
-    const picked = await execAsync(
-      "hyprpicker --format=hex --autocopy --no-fancy",
-    ).catch(console.error);
-
-    if (!picked) return;
-
-    const color = picked!.toLowerCase();
-    this.add(color);
-    return color;
+  pick() {
+    const proc = subprocess(
+      "hyprpicker --format=hex --autocopy --no-fancy --lowercase-hex",
+      (out) => {
+        // Hyprpicker seems to exit in a way that makes execAsync() hang,
+        // even if a color has been picked, so this circumvents that
+        proc.kill();
+        this.add(out);
+      },
+      (err) => print(err),
+    );
   }
 
   async copy(color: string) {
@@ -86,14 +81,12 @@ export default class Colorpicker extends GObject.Object {
     }
 
     this.notify("colors");
-    this.notify("lastColor");
     this.updateCache();
   }
 
   remove(color: string) {
     this.#colors.splice(this.#colors.indexOf(color), 1);
     this.notify("colors");
-    this.notify("lastColor");
     this.updateCache();
   }
 
