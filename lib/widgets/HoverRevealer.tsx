@@ -1,11 +1,7 @@
-import { Binding } from "astal";
 import { Widget, Gtk } from "astal/gtk4";
-import { pointer } from "../utils";
 
-interface HoverRevealerProps extends Widget.ButtonProps {
+interface HoverRevealerProps extends Widget.RevealerProps {
   hiddenChild: Gtk.Widget;
-  transitionDuration?: number | Binding<number>;
-  transitionType?: Gtk.RevealerTransitionType;
 }
 
 export default ({
@@ -21,26 +17,20 @@ export default ({
     <revealer
       transitionDuration={transitionDuration}
       transitionType={transitionType}
-    >
-      {hiddenChild}
-    </revealer>
+      child={hiddenChild}
+      {...props}
+    />
   ) as Gtk.Revealer;
 
-  const result = (
-    <button
+  return (
+    <box
+      setup={(self) => self.set_cursor_from_name("pointer")}
+      cssClasses={["hover-revealer"]}
       onHoverEnter={() => (Revealer.revealChild = true)}
       onHoverLeave={() => (Revealer.revealChild = false)}
-      {...props}
     >
-      <box cssClasses={["revealer-box"]}>
-        {Revealer}
-        {child}
-      </box>
-    </button>
+      {Revealer}
+      {child}
+    </box>
   );
-
-  result.add_css_class("hover-revealer");
-  pointer(result);
-
-  return result;
 };
