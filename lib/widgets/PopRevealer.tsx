@@ -1,38 +1,44 @@
-import { Binding } from "astal";
-import { Widget, Gtk, hook } from "astal/gtk4";
+import { Binding, timeout } from "astal";
+import { Widget, Gtk } from "astal/gtk4";
+import GObject from "astal/gobject";
 
 interface PopRevealerProps extends Widget.PopoverProps {
   transitionDuration?: number | Binding<number>;
   transitionType?: Gtk.RevealerTransitionType;
 }
 
-export default ({
-  child,
-  transitionDuration = 150,
-  transitionType = Gtk.RevealerTransitionType.SLIDE_DOWN,
-  ...props
-}: PopRevealerProps): Gtk.Popover => {
-  const Revealer = (
-    <revealer
-      transitionDuration={transitionDuration}
-      transitionType={transitionType}
-      child={child}
-    />
-  ) as Gtk.Revealer;
+export default class PopRevealer extends Gtk.Popover {
+  static {
+    GObject.registerClass({ GTypeName: "PopRevealer" }, this);
+  }
 
-  const Popover = (
-    <popover {...props}>
-      {Revealer}
-    </popover>
-  ) as Gtk.Popover;
+  #revealer: Gtk.Revealer;
 
-  hook(Popover, Popover, "show", (self) => {
-    self.add_css_class("pop-down");
-  });
+  constructor({
+    child,
+    transitionDuration = 200,
+    transitionType = Gtk.RevealerTransitionType.SLIDE_DOWN,
+    ...props
+  }: PopRevealerProps) {
+    super({ ...props });
 
-  hook(Revealer, Popover, "notify::visible", (self) => {
-    self.revealChild = Popover.visible;
-  });
+    this.#revealer = (
+      <revealer
+        transitionDuration={transitionDuration}
+        transitionType={transitionType}
+        child={child}
+      />
+    ) as Gtk.Revealer;
+    this.child = this.#revealer;
+  }
 
-  return Popover;
-};
+  vfunc_show() {
+    super.vfunc_show();
+    this.#revealer.reveal_child = true;
+  }
+
+  vfunc_hide() {
+    this.#revealer.reveal_child = false;
+    timeout(this.#revealer.transition_duration, () => super.vfunc_hide());
+  }
+}
