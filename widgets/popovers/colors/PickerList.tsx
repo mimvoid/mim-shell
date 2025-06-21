@@ -74,14 +74,14 @@ function ColorItem(color: string) {
 
 function Actions() {
   const saveColors = () => {
-    const Picker = new Gtk.FileDialog({
+    const FilePicker = new Gtk.FileDialog({
       acceptLabel: "Save",
-      initialFolder: Gio.File.new_for_path(picker.storeFolder),
+      initialFolder: Gio.File.new_for_path(Picker.storeFolder),
       initialName: "color-history.json",
     });
 
-    Picker.save(null, null, (_, res) => {
-      const newFile = Picker.save_finish(res)!;
+    FilePicker.save(null, null, (_, res) => {
+      const newFile = FilePicker.save_finish(res)!;
       const newPath = newFile.get_path()!;
       writeFile(newPath, JSON.stringify(picker.colors));
     });

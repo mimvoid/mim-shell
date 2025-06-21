@@ -1,83 +1,103 @@
-import { execAsync, readFile, writeFile } from "astal";
+import { execAsync, readFile, writeFileAsync } from "astal";
 import GObject, { register, property } from "astal/gobject";
+import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib";
 
 const MAX_COLORS = 10;
 
 @register({ GTypeName: "Colorpicker" })
-export default class ColorPicker extends GObject.Object {
-  static instance: ColorPicker;
+export default class Colorpicker extends GObject.Object {
+  static instance: Colorpicker;
+  static readonly storeFolder = GLib.get_user_state_dir() + "/ags";
+  static readonly storeFile = Colorpicker.storeFolder + "/colorpicker.json";
 
   static get_default() {
-    if (!this.instance) this.instance = new ColorPicker();
+    if (!this.instance) this.instance = new Colorpicker();
     return this.instance;
   }
 
-  readonly storeFolder = GLib.get_user_state_dir() + "/ags";
-  readonly storeFile = this.storeFolder + "/colorpicker.json";
+  #colors: string[] = [];
 
-  #colors = this.readColorsCache();
+  constructor() {
+    super();
+
+    try {
+      this.#colors = JSON.parse(readFile(Colorpicker.storeFile));
+    } catch (err) {
+      err === Gio.IOErrorEnum.NOT_FOUND
+        ? writeFileAsync(Colorpicker.storeFile, "[]")
+        : console.error(err);
+    }
+  }
 
   @property()
   get colors() {
-    return [...this.#colors];
+    return this.#colors;
   }
 
   set colors(colors) {
     this.#colors = colors;
     this.notify("colors");
-    writeFile(this.storeFile, JSON.stringify(colors, null, 2));
+    this.notify("lastColor");
+    this.updateCache();
   }
 
-  @property()
+  @property(String)
   get lastColor() {
-    return this.colors[this.colors.length - 1] || "#000000";
+    return this.colors.at(-1) || "#000000";
   }
 
-  private readColorsCache(): string[] {
-    try {
-      return JSON.parse(readFile(this.storeFile));
-    } catch (error) {
-      writeFile(this.storeFile, "[]");
-      return [];
-    }
+  private async updateCache() {
+    writeFileAsync(
+      Colorpicker.storeFile,
+      JSON.stringify(this.#colors, null, 2),
+    ).catch(console.error);
   }
 
-  readonly pick = async () => {
-    const color = await execAsync(
+  async pick() {
+    const picked = await execAsync(
       "hyprpicker --format=hex --autocopy --no-fancy",
     ).catch(console.error);
-    if (!color) return;
 
-    this.add(color.toLowerCase());
-    return color.toLowerCase();
-  };
+    if (!picked) return;
 
-  readonly copy = async (color: string) => {
+    const color = picked!.toLowerCase();
+    this.add(color);
+    return color;
+  }
+
+  async copy(color: string) {
     execAsync(["wl-copy", color]).catch(console.error);
     execAsync(
       `notify-send "Colorpicker" "Copied to clipboard:\n\n${color}"`,
     ).catch(console.error);
-  };
+  }
 
-  readonly add = (color: string) => {
-    let list = this.colors;
+  add(color: string) {
+    const index = this.#colors.indexOf(color);
 
-    if (list.includes(color)) {
-      list = list.filter((c) => c !== color);
-      list.push(color);
+    if (index === -1) {
+      // Color does not already exist, add it
+      const length = this.#colors.push(color);
+      if (length > MAX_COLORS) this.#colors.shift();
     } else {
-      list.push(color);
-      if (list.length > MAX_COLORS) list.shift();
+      // Move the existing color to the end
+      this.#colors.push(this.#colors.splice(index, 1)[0]);
     }
 
-    this.colors = list;
-  };
+    this.notify("colors");
+    this.notify("lastColor");
+    this.updateCache();
+  }
 
-  readonly remove = (color: string) => {
-    const newList = this.colors.filter((c) => c !== color);
-    this.colors = newList;
-  };
+  remove(color: string) {
+    this.#colors.splice(this.#colors.indexOf(color), 1);
+    this.notify("colors");
+    this.notify("lastColor");
+    this.updateCache();
+  }
 
-  readonly clear = () => (this.colors = []);
+  clear() {
+    this.colors = [];
+  }
 }

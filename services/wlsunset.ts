@@ -1,26 +1,25 @@
 import GObject, { register, property } from "astal/gobject";
 import { exec, execAsync } from "astal";
 
-function getWlsunset() {
-  try {
-    return exec("pidof wlsunset") !== null;
-  } catch (err) {
-    return false;
-  }
-}
-
-// Create library
 @register({ GTypeName: "wlsunset" })
 export default class WlSunset extends GObject.Object {
   static instance: WlSunset;
 
-  // WlSunset.get_default() returns this object
   static get_default() {
     if (!this.instance) this.instance = new WlSunset();
     return this.instance;
   }
 
-  #running = getWlsunset();
+  #running;
+
+  constructor() {
+    super();
+    try {
+      this.#running = exec("pidof wlsunset") !== null;
+    } catch (err) {
+      this.#running = false;
+    }
+  }
 
   @property(Boolean)
   get running() {

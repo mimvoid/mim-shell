@@ -13,7 +13,7 @@ const Trigger = (
   <button
     setup={(self) => self.set_cursor_from_name("pointer")}
     cssClasses={["color-button"]}
-    onClicked={() => picker.pick().catch(console.error)}
+    onClicked={() => picker.pick()}
     tooltipText={bind(picker, "lastColor").as((c) => `Last color: ${c}`)}
     iconName={Icons.colorpicker}
   />

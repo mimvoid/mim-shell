@@ -100,7 +100,8 @@ function EntryBox() {
       icon: Icons.colorpicker,
       tooltip: "Pick color",
       cmd: async () => {
-        const newColor = (await picker.pick())!;
+        const newColor = await picker.pick();
+        if (!newColor) return;
         updateColor(newColor);
       },
     },

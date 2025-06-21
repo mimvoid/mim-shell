@@ -14,7 +14,7 @@ const Choices = bind(wallpapers, "wallpapers").as((ws) =>
       setup={(self) => self.set_cursor_from_name("pointer")}
       cssClasses={["item"]}
       onClicked={() => {
-        if (w[0]) wallpapers.setWallpaper(wallpapers.wallpaperDir + w[0]);
+        if (w[0]) wallpapers.setWallpaper(Wallpapers.directory + w[0]);
       }}
     >
       <box vertical spacing={8}>
@@ -23,7 +23,7 @@ const Choices = bind(wallpapers, "wallpapers").as((ws) =>
           <Picture
             type="overlay clip measure"
             file={Gio.File.new_for_path(
-              w[1] || wallpapers.wallpaperDir + w[0] || "",
+              w[1] || Wallpapers.directory + w[0] || "",
             )}
             valign={Gtk.Align.FILL}
           />
