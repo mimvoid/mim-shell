@@ -1,9 +1,9 @@
 import { Gtk, hook, Astal } from "astal/gtk4";
 import Cava from "gi://AstalCava";
 
-const { END, FILL } = Gtk.Align;
-
 export default () => {
+  const { END, FILL } = Gtk.Align;
+
   const cava = Cava.get_default()!;
   cava.bars = 12;
   cava.active = true;
@@ -27,11 +27,13 @@ export default () => {
     <box
       setup={(self) => {
         hook(self, cava, "notify::values", () => {
+          const values = cava.get_values();
           for (let i = 0; i < Bars.length; i++) {
-            Bars[i].value = cava.get_values()[i];
+            Bars[i].value = values[i];
           }
         });
-        self.connect("notify::visible", () => (cava.active = self.visible));
+        hook(self, self, "map", () => (cava.active = true));
+        hook(self, self, "unmap", () => (cava.active = false));
       }}
       cssClasses={["cava"]}
       spacing={2}
