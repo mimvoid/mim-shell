@@ -14,7 +14,9 @@ const Trigger = (
     setup={(self) => self.set_cursor_from_name("pointer")}
     cssClasses={["color-button"]}
     onClicked={() => picker.pick()}
-    tooltipText={bind(picker, "lastColor").as((c) => `Last color: ${c}`)}
+    tooltipText={bind(picker, "colors").as(
+      (c) => `Last color: ${c.at(-1) || "#000000"}`,
+    )}
     iconName={Icons.colorpicker}
   />
 );
@@ -26,7 +28,7 @@ function Color() {
       setup={(self) => {
         function colorHook() {
           const gRgb = new Gdk.RGBA();
-          if (gRgb.parse(picker.lastColor)) {
+          if (gRgb.parse(picker.colors.at(-1) || "#000000")) {
             self.rgba = gRgb;
           } else if (!self.rgba) {
             gRgb.red = 0;
@@ -37,7 +39,7 @@ function Color() {
           }
         }
         colorHook();
-        hook(self, picker, "notify::lastColor", colorHook);
+        hook(self, picker, "notify::colors", colorHook);
       }}
       cssClasses={["color-display"]}
     />
@@ -49,7 +51,9 @@ function Color() {
       <HoverRevealer
         hiddenChild={
           <box cssClasses={["color-box"]}>
-            <label label={bind(picker, "lastColor")} />
+            <label
+              label={bind(picker, "colors").as((c) => c.at(-1) || "#000000")}
+            />
             {colorDisplay}
           </box>
         }

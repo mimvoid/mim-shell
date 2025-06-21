@@ -1,5 +1,5 @@
 import { Variable } from "astal";
-import { Gtk } from "astal/gtk4";
+import { Gtk, hook } from "astal/gtk4";
 import Gdk from "gi://Gdk";
 
 import Picker from "@services/colorpicker";
@@ -26,11 +26,14 @@ function updateColor(value: string) {
   const newColor = new Gdk.RGBA();
   if (newColor.parse(value)) color.set(newColor);
 }
-updateColor(picker.lastColor);
+const lastColor = picker.colors.at(-1);
+if (lastColor) updateColor(lastColor);
 
 const Entry = (
   <entry
-    setup={(self) => color.subscribe((value) => self.placeholderText = value.to_string())}
+    setup={(self) =>
+      color.subscribe((value) => (self.placeholderText = value.to_string()))
+    }
     placeholderText={color.get().to_string()}
     onChanged={(self) => updateColor(self.text)}
   />
@@ -39,7 +42,17 @@ const Entry = (
 function Switcher() {
   const Display = (
     <ColorDialogButton
-      setup={pointer}
+      setup={(self) => {
+        pointer(self);
+
+        hook(self, picker, "notify::colors", () => {
+          // Update the color Variable if no text has been saved
+          if (Entry.text !== "") return;
+
+          const lastColor = picker.colors.at(-1);
+          if (lastColor) updateColor(lastColor);
+        });
+      }}
       rgba={color()}
       cssClasses={["color-box"]}
       hexpand
@@ -99,11 +112,7 @@ function EntryBox() {
     {
       icon: Icons.colorpicker,
       tooltip: "Pick color",
-      cmd: async () => {
-        const newColor = await picker.pick();
-        if (!newColor) return;
-        updateColor(newColor);
-      },
+      cmd: () => picker.pick(),
     },
   ];
 

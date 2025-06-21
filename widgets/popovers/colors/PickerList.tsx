@@ -14,12 +14,12 @@ const picker = Picker.get_default();
 const { START, CENTER, END } = Gtk.Align;
 
 function ColorItem(color: string) {
-  const curr = Variable(color);
+  const text = Variable(color);
 
   const Main = (
     <button
       setup={pointer}
-      onClicked={() => picker.copy(curr.get())}
+      onClicked={() => picker.copy(text.get())}
       cssClasses={["main-info"]}
       hexpand
     >
@@ -34,24 +34,38 @@ function ColorItem(color: string) {
           halign={START}
           valign={CENTER}
         />
-        <label label={bind(curr)} halign={START} />
+        <label label={bind(text)} halign={START} />
       </box>
     </button>
   );
 
-  const Switcher = bind(curr).as((c) => {
-    switch (c) {
-      case color:
-        const setRgb = () => curr.set(hexToRgb(color)!);
-        return <button setup={pointer} label="rgb" onClicked={setRgb} />;
-      case hexToRgb(color):
-        const setHsl = () => curr.set(hexToHsl(color)!);
-        return <button setup={pointer} label="hsl" onClicked={setHsl} />;
-      default:
-        const setHex = () => curr.set(color);
-        return <button setup={pointer} label="hex" onClicked={setHex} />;
-    }
-  });
+  const Switcher = (
+    <button
+      setup={pointer}
+      label="hex"
+      onClicked={(self) => {
+        switch (text.get().charAt(0)) {
+          case "#":
+            let rgb = hexToRgb(color);
+            if (rgb) {
+              text.set(rgb);
+              self.label = "rgb";
+            }
+            break;
+          case "r":
+            const hsl = hexToHsl(color);
+            if (hsl) {
+              text.set(hsl);
+              self.label = "hsl";
+            }
+            break;
+          default:
+            text.set(color);
+            self.label = "hex";
+        }
+      }}
+    />
+  );
 
   const Actions = (
     <box className="actions" halign={END}>
@@ -65,7 +79,7 @@ function ColorItem(color: string) {
   );
 
   return (
-    <box cssClasses={["color-item"]} hexpand>
+    <box cssClasses={["color-item"]} hexpand onDestroy={() => text.drop()}>
       {Main}
       {Actions}
     </box>
@@ -73,7 +87,7 @@ function ColorItem(color: string) {
 }
 
 function Actions() {
-  const saveColors = () => {
+  function saveColors() {
     const FilePicker = new Gtk.FileDialog({
       acceptLabel: "Save",
       initialFolder: Gio.File.new_for_path(Picker.storeFolder),
@@ -81,11 +95,10 @@ function Actions() {
     });
 
     FilePicker.save(null, null, (_, res) => {
-      const newFile = FilePicker.save_finish(res)!;
-      const newPath = newFile.get_path()!;
-      writeFile(newPath, JSON.stringify(picker.colors));
+      const newPath = FilePicker.save_finish(res)?.get_path();
+      if (newPath) writeFile(newPath, JSON.stringify(picker.colors));
     });
-  };
+  }
 
   return (
     <box spacing={4} halign={END}>
