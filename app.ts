@@ -1,14 +1,8 @@
 #!/usr/bin/env gjs -m
 
 import { App } from "astal/gtk4";
-
-// Get root stylesheet
-import style from "./style/style.scss";
-
-// Get windows
-import Bar from "./widgets/bar/bar";
-import NotificationPopups from "./widgets/notifications/notificationPopups";
-import SessionMenu from "./widgets/session";
+import style from "./style/style.scss"; // root stylesheet
+import { Bar, Notifications, SessionMenu } from "./widgets"; // windows
 
 App.start({
   css: style,
@@ -23,7 +17,7 @@ App.start({
     // Map to every monitor
     for (const monitor of App.get_monitors()) {
       Bar(monitor);
-      NotificationPopups(monitor);
+      Notifications(monitor);
     }
 
     SessionMenu();

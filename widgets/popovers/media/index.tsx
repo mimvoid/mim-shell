@@ -1,8 +1,8 @@
 import { bind } from "astal";
 import Mpris from "gi://AstalMpris";
 
-import MediaStack from "./media/Stack";
-import Placeholder from "./media/Placeholder";
+import MediaStack from "./Stack";
+import Placeholder from "./Placeholder";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
 const mpris = Mpris.get_default();

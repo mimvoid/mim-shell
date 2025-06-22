@@ -13,7 +13,7 @@ import Network from "./network";
 import Bluetooth from "./bluetooth";
 import Sound from "./sound";
 import Battery from "./battery";
-import Brightness from "./brightness/brightness";
+import Brightness from "./brightness";
 import { setLayerrules } from "@lib/utils";
 
 // Define the three parts of the bar

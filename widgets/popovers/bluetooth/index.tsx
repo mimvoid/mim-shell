@@ -5,7 +5,7 @@ import Bluetooth from "gi://AstalBluetooth";
 import Icon from "@lib/icons";
 import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
-import { connectedDevices, disconnectedDevices } from "./bluetooth/DeviceItem";
+import { connectedDevices, disconnectedDevices } from "./DeviceItem";
 
 const bluetooth = Bluetooth.get_default();
 const { START, CENTER } = Gtk.Align;

@@ -3,8 +3,8 @@ import { Gtk } from "astal/gtk4";
 import { name } from "@lib/variables";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
-import Toggles from "./dashboard/toggles";
-import Launchers from "./dashboard/launchers";
+import Toggles from "./toggles";
+import Launchers from "./launchers";
 
 const { START, CENTER } = Gtk.Align;
 

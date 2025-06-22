@@ -1,5 +1,5 @@
-import PickerList from "./colors/PickerList";
-import Converter from "./colors/Converter";
+import PickerList from "./PickerList";
+import Converter from "./Converter";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
 export default (
