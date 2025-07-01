@@ -11,10 +11,8 @@ import { Picture } from "@lib/astalified";
 import Icon from "@lib/icons";
 
 // Information about the current song
-
-const { START, END, FILL } = Gtk.Align;
-
 export default (player: Mpris.Player) => {
+  const { START, END, FILL } = Gtk.Align;
   const CavaWidget: Variable<Gtk.Widget | null> = Variable(null);
 
   const VisToggle = (overlay: Gtk.Overlay) => (

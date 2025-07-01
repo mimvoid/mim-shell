@@ -53,10 +53,8 @@ export default () => {
       layer={Astal.Layer.OVERLAY}
       exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.EXCLUSIVE}
-      onKeyPressed={(_, keyval) => {
-        if (keyval === Gdk.KEY_Escape) {
-          App.toggle_window("wallpaperPicker");
-        }
+      onKeyPressed={({ name }, keyval) => {
+        if (keyval === Gdk.KEY_Escape) App.toggle_window(name);
       }}
       application={App}
       marginBottom={12}

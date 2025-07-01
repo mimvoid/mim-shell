@@ -6,9 +6,9 @@ import PopRevealer from "@lib/widgets/PopRevealer";
 
 const { START, CENTER, FILL } = Gtk.Align;
 
-const wp = Wp.get_default();
-const speaker = wp?.audio.defaultSpeaker!;
-const microphone = wp?.audio.defaultMicrophone!;
+const wp = Wp.get_default()!;
+const speaker = wp.audio.defaultSpeaker;
+const microphone = wp.audio.defaultMicrophone;
 
 function Section(endpoint: Wp.Endpoint, name: string) {
   const lowerName = name.toLowerCase();

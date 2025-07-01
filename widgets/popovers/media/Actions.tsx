@@ -68,11 +68,11 @@ export default (player: Mpris.Player) => {
           const { UNSUPPORTED, NONE, TRACK } = Mpris.Loop;
           const loop = player.loopStatus;
 
-          self.visible = loop !== UNSUPPORTED;
+          self.visible = loop != UNSUPPORTED;
           if (!self.visible) return;
 
-          self.iconName = Icons.mpris[loop === TRACK ? "loopSong" : "loop"];
-          loop === NONE
+          self.iconName = Icons.mpris[loop == TRACK ? "loopSong" : "loop"];
+          loop == NONE
             ? self.add_css_class("off")
             : self.remove_css_class("off");
         }
@@ -99,8 +99,8 @@ export default (player: Mpris.Player) => {
           self.visible = s !== UNSUPPORTED;
           if (!self.visible) return;
 
-          self.iconName = Icons.mpris[s === ON ? "shuffle" : "noShuffle"];
-          s === OFF ? self.add_css_class("off") : self.remove_css_class("off");
+          self.iconName = Icons.mpris[s == ON ? "shuffle" : "noShuffle"];
+          s == OFF ? self.add_css_class("off") : self.remove_css_class("off");
         }
 
         shuffleHook();

@@ -24,7 +24,7 @@ export function hexToRgb(value: string) {
 }
 
 function asHex(n: number) {
-  return (Math.floor(n)).toString(16).padStart(2, "0");
+  return Math.floor(n).toString(16).padStart(2, "0");
 }
 
 export function gRgbaToHex(g: Gdk.RGBA) {

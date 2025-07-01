@@ -17,8 +17,8 @@ function Session() {
 
   const ButtonGrid = (
     <Grid
-      rowHomogeneous={true}
-      columnHomogeneous={true}
+      rowHomogeneous
+      columnHomogeneous
       columnSpacing={2}
       rowSpacing={2}
     />
@@ -90,10 +90,8 @@ export default () => (
     exclusivity={Astal.Exclusivity.NORMAL}
     layer={Astal.Layer.OVERLAY}
     keymode={Astal.Keymode.EXCLUSIVE}
-    onKeyPressed={(_, keyval) => {
-      if (keyval === Gdk.KEY_Escape) {
-        App.toggle_window("session");
-      }
+    onKeyPressed={({ name }, keyval) => {
+      if (keyval === Gdk.KEY_Escape) App.toggle_window(name);
     }}
     application={App}
   >

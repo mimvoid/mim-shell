@@ -41,7 +41,7 @@ function Time() {
   const Uptime = (
     <label
       label={bind(uptime).as(
-        (t) => `Up: ${Math.floor(t / 60)}h ${Math.floor(t % 60)}m` || "",
+        (t) => `Up: ${Math.floor(t / 60)}h ${Math.floor(t % 60)}m`,
       )}
       cssClasses={["uptime"]}
       halign={START}
