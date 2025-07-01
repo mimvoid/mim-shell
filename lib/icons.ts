@@ -29,7 +29,7 @@ export default {
   disk: "drive-harddisk-symbolic",
   memory: "memory-symbolic",
 
-  hider: "go-previous-symbolic",
+  hider: "pan-start-symbolic",
 
   mimetypes: {
     image: "image-x-generic-symbolic",
@@ -60,7 +60,7 @@ export default {
     off: "notifications-disabled-symbolic",
   },
 
-  overview: "emblem-favorite-symbolic",
+  overview: "emote-love-symbolic",
 
   powermenu: {
     indicator: "system-shutdown-symbolic",
