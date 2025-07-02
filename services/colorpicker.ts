@@ -85,7 +85,10 @@ export default class Colorpicker extends GObject.Object {
   }
 
   remove(color: string) {
-    this.#colors.splice(this.#colors.indexOf(color), 1);
+    const index = this.#colors.indexOf(color);
+    if (index === -1) return;
+
+    this.#colors.splice(index, 1);
     this.notify("colors");
     this.updateCache();
   }
