@@ -8,11 +8,10 @@
     "module": "ES2023",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "/home/zinnia/.local/share/ags/gtk4",
+    "jsxImportSource": "astal/gtk4",
     "paths": {
       "astal": ["/home/zinnia/.local/share/ags"],
       "astal/*": ["/home/zinnia/.local/share/ags/*"],
-      "@root": ["./"],
       "@lib/*": ["./lib/*"],
       "@services/*": ["./services/*"],
       "@widgets/*": ["./widgets/*"]
