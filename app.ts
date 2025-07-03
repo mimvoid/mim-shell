@@ -8,11 +8,6 @@ App.start({
   css: style,
   iconTheme: "Adwaita",
 
-  requestHandler(request, res) {
-    print(request);
-    res("ok");
-  },
-
   main() {
     // Map to every monitor
     for (const monitor of App.get_monitors()) {

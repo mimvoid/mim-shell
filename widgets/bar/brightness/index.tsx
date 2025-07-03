@@ -9,7 +9,6 @@ import { drawValuePercentage } from "@lib/utils";
 // Brightness label & slider
 
 const brightness = Brightness.get_default();
-const { CENTER } = Gtk.Align;
 
 function BrightnessBox() {
   // Change brightness on drag
@@ -21,7 +20,7 @@ function BrightnessBox() {
       }}
       value={bind(brightness, "light")}
       onChangeValue={({ value }) => (brightness.light = value)}
-      valign={CENTER}
+      valign={Gtk.Align.CENTER}
       hexpand
     />
   );

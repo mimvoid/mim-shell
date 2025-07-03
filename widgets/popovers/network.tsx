@@ -16,13 +16,13 @@ const Current = (
         pointer(self);
         popButton(self);
 
-        function enabledHook() {
+        function enabledHook(button: Gtk.Button) {
           const e = wifi.enabled;
-          self.tooltipText = `Turn ${wifi.enabled ? "off" : "on"} wifi`;
-          e ? self.remove_css_class("off") : self.add_css_class("off");
+          button.tooltipText = `Turn ${wifi.enabled ? "off" : "on"} wifi`;
+          e ? button.remove_css_class("off") : button.add_css_class("off");
         }
 
-        enabledHook();
+        enabledHook(self);
         hook(self, wifi, "notify::enabled", enabledHook);
       }}
       cssClasses={["big-toggle"]}

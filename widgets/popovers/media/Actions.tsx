@@ -64,20 +64,20 @@ export default (player: Mpris.Player) => {
         pointer(self);
         popButton(self);
 
-        function loopHook() {
+        function loopHook(button: Gtk.Button) {
           const { UNSUPPORTED, NONE, TRACK } = Mpris.Loop;
           const loop = player.loopStatus;
 
-          self.visible = loop != UNSUPPORTED;
-          if (!self.visible) return;
+          button.visible = loop !== UNSUPPORTED;
+          if (!button.visible) return;
 
-          self.iconName = Icons.mpris[loop == TRACK ? "loopSong" : "loop"];
+          button.iconName = Icons.mpris[loop === TRACK ? "loopSong" : "loop"];
           loop == NONE
-            ? self.add_css_class("off")
-            : self.remove_css_class("off");
+            ? button.add_css_class("off")
+            : button.remove_css_class("off");
         }
 
-        loopHook();
+        loopHook(self);
         hook(self, player, "notify::loop-status", loopHook);
       }}
       cssClasses={["loop"]}
@@ -92,18 +92,18 @@ export default (player: Mpris.Player) => {
         pointer(self);
         popButton(self);
 
-        function shuffleHook() {
+        function shuffleHook(button: Gtk.Button) {
           const { UNSUPPORTED, ON, OFF } = Mpris.Shuffle;
           const s = player.shuffleStatus;
 
-          self.visible = s !== UNSUPPORTED;
-          if (!self.visible) return;
+          button.visible = s !== UNSUPPORTED;
+          if (!button.visible) return;
 
-          self.iconName = Icons.mpris[s == ON ? "shuffle" : "noShuffle"];
-          s == OFF ? self.add_css_class("off") : self.remove_css_class("off");
+          button.iconName = Icons.mpris[s === ON ? "shuffle" : "noShuffle"];
+          s === OFF ? button.add_css_class("off") : button.remove_css_class("off");
         }
 
-        shuffleHook();
+        shuffleHook(self);
         hook(self, player, "notify::shuffle-status", shuffleHook);
       }}
       cssClasses={["shuffle"]}

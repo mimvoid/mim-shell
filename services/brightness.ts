@@ -44,7 +44,7 @@ export default class Brightness extends GObject.Object {
     this.#light = percent;
     this.notify("light");
 
-    execAsync(`brightnessctl set ${Math.floor(percent * 100)}% -q`).catch(
+    execAsync(`brightnessctl set ${Math.trunc(percent * 100)}% -q`).catch(
       console.error,
     );
   }

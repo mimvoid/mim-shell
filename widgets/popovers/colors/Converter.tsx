@@ -23,8 +23,8 @@ const color = Variable(
 );
 
 function updateColor(value: string) {
-  const newColor = new Gdk.RGBA();
-  if (newColor.parse(value)) color.set(newColor);
+  const rgba = color.get();
+  if (rgba.parse(value)) color.set(rgba.copy());
 }
 const lastColor = picker.colors.at(-1);
 if (lastColor) updateColor(lastColor);
@@ -47,7 +47,7 @@ function Switcher() {
 
         hook(self, picker, "notify::colors", () => {
           // Update the color Variable if no text has been saved
-          if (Entry.text !== "") return;
+          if (!!Entry.text) return;
 
           const lastColor = picker.colors.at(-1);
           if (lastColor) updateColor(lastColor);

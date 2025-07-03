@@ -15,9 +15,19 @@ function Status() {
     execAsync(`bluetooth ${bluetooth.isPowered ? "off" : "on"}`);
 
   // Display icon depending on Bluetooth status
-  const icon = bind(bluetooth, "isPowered").as((p) =>
-    p ? Icon.bluetooth.enabled : Icon.bluetooth.disabled,
+  const icon = bind(bluetooth, "isPowered").as(
+    (p) => Icon.bluetooth[p ? "enabled" : "disabled"],
   );
+
+  function powerHook(button: Gtk.Button) {
+    if (bluetooth.isPowered) {
+      button.tooltipText = "Turn off Bluetooth";
+      button.remove_css_class("off");
+    } else {
+      button.tooltipText = "Turn on Bluetooth";
+      button.add_css_class("off");
+    }
+  }
 
   return (
     <box cssClasses={["status", "section"]}>
@@ -26,13 +36,7 @@ function Status() {
           pointer(self);
           popButton(self);
 
-          function powerHook() {
-            const p = bluetooth.isPowered;
-            self.tooltipText = `Turn ${p ? "off" : "on"} Bluetooth`;
-            p ? self.remove_css_class("off") : self.add_css_class("on");
-          }
-
-          powerHook();
+          powerHook(self);
           hook(self, bluetooth, "notify::is-powered", powerHook);
         }}
         cssClasses={["big-toggle"]}
@@ -65,7 +69,7 @@ function Connected() {
     >
       <label cssClasses={["title"]} label="Connected" halign={START} />
       {bind(connectedDevices).as((d) =>
-        d.length == 0 ? DefaultLabel : <box vertical>{d}</box>,
+        d[0] ? <box vertical>{d}</box> : DefaultLabel,
       )}
     </box>
   );

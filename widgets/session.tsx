@@ -5,72 +5,43 @@ import Icon from "@lib/icons";
 import { setLayerrules } from "@lib/utils";
 import { Grid } from "@lib/astalified";
 
-interface Action {
-  name: string;
-  command: string;
-  halign: Gtk.Align;
-  valign: Gtk.Align;
-}
+const Session = () => (
+  <Grid
+    setup={(self) => {
+      const { START, END } = Gtk.Align;
+      const actions: string[][] = [
+        ["lock", "hyprlock"],
+        ["logout", "hyprctl dispatch exit"],
+        ["reboot", "systemctl reboot"],
+        ["shutdown", "systemctl poweroff"],
+      ];
 
-function Session() {
-  const { START, END } = Gtk.Align;
+      for (let i = 0; i < 4; i++) {
+        const [name, command] = actions[i]
+        const [halign, hcell] = i <= 1 ? [END, 1] : [START, 2];
+        const [valign, vcell] = i % 2 == 0 ? [END, 1] : [START, 2];
 
-  const ButtonGrid = (
-    <Grid
-      rowHomogeneous
-      columnHomogeneous
-      columnSpacing={2}
-      rowSpacing={2}
-    />
-  ) as Gtk.Grid;
+        const Button = (
+          <button
+            setup={(self) => self.set_cursor_from_name("pointer")}
+            name={name}
+            cssClasses={["box"]}
+            halign={halign}
+            valign={valign}
+            onClicked={() => exec(command)}
+            iconName={Icon.powermenu[name]}
+          />
+        );
 
-  const actions: Action[] = [
-    {
-      name: "lock",
-      command: "hyprlock",
-      halign: END,
-      valign: END,
-    },
-    {
-      name: "logout",
-      command: "hyprctl dispatch exit",
-      halign: END,
-      valign: START,
-    },
-    {
-      name: "reboot",
-      command: "systemctl reboot",
-      halign: START,
-      valign: END,
-    },
-    {
-      name: "shutdown",
-      command: "systemctl poweroff",
-      halign: START,
-      valign: START,
-    },
-  ];
-
-  for (const { name, command, halign, valign } of actions) {
-    const Button = (
-      <button
-        setup={(self) => self.set_cursor_from_name("pointer")}
-        name={name}
-        cssClasses={["box"]}
-        halign={halign}
-        valign={valign}
-        onClicked={() => exec(command)}
-        iconName={Icon.powermenu[name]}
-      />
-    );
-
-    const cell = (align: Gtk.Align) => (align === END ? 1 : 2);
-
-    ButtonGrid.attach(Button, cell(halign), cell(valign), 1, 1);
-  }
-
-  return ButtonGrid;
-}
+        self.attach(Button, hcell, vcell, 1, 1);
+      }
+    }}
+    rowHomogeneous
+    columnHomogeneous
+    columnSpacing={2}
+    rowSpacing={2}
+  />
+);
 
 export default () => (
   <window

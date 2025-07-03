@@ -46,7 +46,7 @@ function ColorItem(color: string) {
       onClicked={(self) => {
         switch (text.get().charAt(0)) {
           case "#":
-            let rgb = hexToRgb(color);
+            const rgb = hexToRgb(color);
             if (rgb) {
               text.set(rgb);
               self.label = "rgb";

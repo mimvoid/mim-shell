@@ -1,4 +1,4 @@
-import { hook } from "astal/gtk4";
+import { Gtk, hook } from "astal/gtk4";
 import Notifd from "gi://AstalNotifd";
 
 import Icons from "@lib/icons";
@@ -12,14 +12,16 @@ const NotifDnd = (
       pointer(self);
       popButton(self);
 
-      function dndHook() {
+      function dndHook(button: Gtk.Button) {
         const dnd = notifd.dontDisturb;
-        dnd ? self.remove_css_class("off") : self.add_css_class("off");
-        self.tooltipText = `Turn ${dnd ? "off" : "on"} Do not Disturb`;
-        self.iconName = Icons.notifications[dnd ? "off" : "on"];
+        const str = dnd ? "off" : "on";
+
+        dnd ? button.remove_css_class("off") : button.add_css_class("off");
+        button.tooltipText = `Turn ${str} Do not Disturb`;
+        button.iconName = Icons.notifications[str];
       }
 
-      dndHook();
+      dndHook(self);
       hook(self, notifd, "notify::dont-disturb", dndHook);
     }}
     cssClasses={["dnd-toggle", "big-toggle"]}

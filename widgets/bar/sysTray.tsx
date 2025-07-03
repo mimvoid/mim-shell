@@ -41,10 +41,10 @@ function SysTrayToggle() {
   const ToggleIcon = (
     <image
       setup={(self) =>
-        hook(self, Revealer, "notify::reveal-child", () =>
+        hook(self, Revealer, "notify::reveal-child", (img) =>
           Revealer.revealChild
-            ? self.add_css_class("open")
-            : self.remove_css_class("open"),
+            ? img.add_css_class("open")
+            : img.remove_css_class("open"),
         )
       }
       cssClasses={["hider"]}
@@ -60,11 +60,11 @@ function SysTrayToggle() {
         self.set_cursor_from_name("pointer");
         if (tray.items && tray.items[0]) self.add_css_class("non-empty");
 
-        hook(self, tray, "item-added", () => {
-          if (!self.has_css_class("non-empty")) self.add_css_class("non-empty");
+        hook(self, tray, "item-added", (b) => {
+          if (!b.has_css_class("non-empty")) b.add_css_class("non-empty");
         });
-        hook(self, tray, "item-removed", () => {
-          if (!tray.items || !tray.items[0]) self.remove_css_class("non-empty");
+        hook(self, tray, "item-removed", (b) => {
+          if (!tray.items || !tray.items[0]) b.remove_css_class("non-empty");
         })
       }}
       cssClasses={["hider-wrapper"]}

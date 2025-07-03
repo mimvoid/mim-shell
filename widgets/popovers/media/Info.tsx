@@ -42,13 +42,13 @@ export default (player: Mpris.Player) => {
   const Art = (
     <Picture
       setup={(self) => {
-        function artHook() {
-          self.visible = Boolean(player.coverArt);
-          if (!player.coverArt) return;
-
-          self.file = Gio.File.new_for_path(player.coverArt);
+        function artHook(pic: Gtk.Picture) {
+          pic.visible = Boolean(player.coverArt);
+          if (pic.visible) {
+            pic.file = Gio.File.new_for_path(player.coverArt);
+          }
         }
-        artHook();
+        artHook(self);
         hook(self, player, "notify::cover-art", artHook);
       }}
       type="overlay clip"

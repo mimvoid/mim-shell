@@ -1,5 +1,5 @@
 import { execAsync } from "astal";
-import { hook } from "astal/gtk4";
+import { Gtk, hook } from "astal/gtk4";
 import Bluetooth from "gi://AstalBluetooth";
 
 import BluetoothPopover from "../popovers/bluetooth";
@@ -14,13 +14,17 @@ const Indicator = (
     setup={(self) => {
       self.set_cursor_from_name("pointer");
 
-      function poweredHook() {
-        const p = bluetooth.isPowered;
-        self.tooltipText = `Bluetooth ${p ? "on" : "off"}`;
-        self.iconName = Icon.bluetooth[p ? "enabled" : "disabled"];
+      function poweredHook(button: Gtk.Button) {
+        if (bluetooth.isPowered) {
+          button.tooltipText = "Bluetooth on";
+          button.iconName = Icon.bluetooth.enabled;
+        } else {
+          button.tooltipText = "Bluetooth off";
+          button.iconName = Icon.bluetooth.disabled;
+        }
       }
 
-      poweredHook();
+      poweredHook(self);
       hook(self, bluetooth, "notify::is-powered", poweredHook);
     }}
     onClicked={() =>
@@ -31,19 +35,19 @@ const Indicator = (
 
 function BluetoothBox() {
   // Show first connected device name
+  function connectHook(label: Gtk.Label) {
+    if (!bluetooth.is_connected) {
+      label.label = "None connected";
+    } else {
+      const firstConnected = bluetooth.devices.find((d) => d.connected)!;
+      label.label = firstConnected.alias;
+    }
+  }
+
   const DeviceName = (
     <label
       setup={(self) => {
-        function connectHook() {
-          if (!bluetooth.is_connected) {
-            self.label = "None connected";
-          } else {
-            const firstConnected = bluetooth.devices.find((d) => d.connected)!;
-            self.label = firstConnected.alias;
-          }
-        }
-
-        connectHook();
+        connectHook(self);
         hook(self, bluetooth, "notify::is-connected", connectHook);
       }}
     />

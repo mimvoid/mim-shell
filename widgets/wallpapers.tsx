@@ -1,8 +1,7 @@
-import { bind } from "astal";
 import { Astal, App, Gtk, Gdk } from "astal/gtk4";
 import Gio from "gi://Gio";
 
-import { setLayerrules } from "@lib/utils";
+import { pointer, setLayerrules } from "@lib/utils";
 import { ScrolledWindow, Picture } from "@lib/astalified";
 import Wallpapers from "@services/wallpapers";
 
@@ -12,39 +11,32 @@ export default () => {
 
   const wallpapers = Wallpapers.get_default();
 
-  const Choices = bind(wallpapers, "wallpapers").as((ws) =>
-    ws.map((w) => (
-      <button
-        setup={(self) => self.set_cursor_from_name("pointer")}
-        cssClasses={["item"]}
-        onClicked={() => {
-          if (w[0]) wallpapers.setWallpaper(Wallpapers.directory + w[0]);
-        }}
-      >
-        <box vertical spacing={8}>
-          <overlay>
-            <box heightRequest={120} widthRequest={240} />
-            <Picture
-              type="overlay clip measure"
-              file={Gio.File.new_for_path(
-                w[1] || Wallpapers.directory + w[0] || "",
-              )}
-              valign={Gtk.Align.FILL}
-            />
-          </overlay>
-          <label cssClasses={["filename"]} label={w[0] || ""} />
-        </box>
-      </button>
-    )),
-  );
+  const Choices = wallpapers.wallpapers.map(([fileName, thumbnail]) => (
+    <button
+      setup={pointer}
+      cssClasses={["item"]}
+      onClicked={() => wallpapers.setWallpaper(Wallpapers.directory + fileName)}
+    >
+      <box vertical spacing={8}>
+        <overlay>
+          <box heightRequest={120} widthRequest={240} />
+          <Picture
+            type="overlay clip measure"
+            file={Gio.File.new_for_path(
+              !!thumbnail ? thumbnail : Wallpapers.directory + fileName,
+            )}
+          />
+        </overlay>
+        <label cssClasses={["filename"]} label={fileName} />
+      </box>
+    </button>
+  ));
 
   return (
     <window
       setup={(self) => {
         setLayerrules(self.namespace, ["blur", "ignorezero", "xray 0"]);
-        const monitor =
-          App.get_monitors()[self.monitor] || App.get_monitors()[0];
-        self.child.widthRequest = monitor.geometry.width;
+        self.child.widthRequest = App.get_monitors()[0].geometry.width;
       }}
       name="wallpaperPicker"
       namespace="wallpaper-picker"

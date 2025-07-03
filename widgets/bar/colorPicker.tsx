@@ -1,5 +1,5 @@
 import { bind } from "astal";
-import { Gdk, hook } from "astal/gtk4";
+import { Gdk, Gtk, hook } from "astal/gtk4";
 
 import Picker from "@services/colorpicker";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
@@ -22,23 +22,24 @@ const Trigger = (
 );
 
 function Color() {
+  function colorHook(cButton: Gtk.ColorDialogButton) {
+    const gRgb = new Gdk.RGBA();
+    if (gRgb.parse(picker.colors.at(-1) || "#000000")) {
+      cButton.rgba = gRgb;
+    } else if (!cButton.rgba) {
+      gRgb.red = 0;
+      gRgb.green = 0;
+      gRgb.blue = 0;
+      gRgb.alpha = 1;
+      cButton.rgba = gRgb;
+    }
+  }
+
   // A circle showing the last picked color
   const colorDisplay = (
     <ColorDialogButton
       setup={(self) => {
-        function colorHook() {
-          const gRgb = new Gdk.RGBA();
-          if (gRgb.parse(picker.colors.at(-1) || "#000000")) {
-            self.rgba = gRgb;
-          } else if (!self.rgba) {
-            gRgb.red = 0;
-            gRgb.green = 0;
-            gRgb.blue = 0;
-            gRgb.alpha = 1;
-            self.rgba = gRgb;
-          }
-        }
-        colorHook();
+        colorHook(self);
         hook(self, picker, "notify::colors", colorHook);
       }}
       cssClasses={["color-display"]}

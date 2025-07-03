@@ -13,6 +13,15 @@ const microphone = wp.audio.defaultMicrophone;
 function Section(endpoint: Wp.Endpoint, name: string) {
   const lowerName = name.toLowerCase();
 
+  function muteHook(button: Gtk.Button) {
+    if (endpoint.mute) {
+      button.tooltipText = `Unmute ${lowerName}`;
+      button.add_css_class("off");
+    } else {
+      button.tooltipText = `Mute ${lowerName}`;
+      button.remove_css_class("off");
+    }
+  }
   const Icon = (
     // Can mute or unmute
     <button
@@ -20,13 +29,7 @@ function Section(endpoint: Wp.Endpoint, name: string) {
         pointer(self);
         popButton(self);
 
-        function muteHook() {
-          const m = endpoint.mute;
-          self.tooltipText = `${m ? "Unmute" : "Mute"} ${lowerName}`;
-          m ? self.add_css_class("off") : self.remove_css_class("off");
-        }
-
-        muteHook();
+        muteHook(self);
         hook(self, endpoint, "notify::mute", muteHook);
       }}
       cssClasses={["big-toggle"]}
@@ -51,7 +54,7 @@ function Section(endpoint: Wp.Endpoint, name: string) {
   const Slider = (
     <slider
       setup={(self) => {
-        self.set_cursor_from_name("pointer");
+        pointer(self);
         drawValuePercentage(self);
       }}
       value={bind(endpoint, "volume")}

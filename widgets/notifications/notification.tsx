@@ -109,24 +109,21 @@ export default (props: Props) => {
 
     const Container = (
       <box cssClasses={["content"]} vertical>
-        {[Summary]}
+        {n.body
+          ? [
+              Summary,
+              <label
+                label={n.body}
+                cssClasses={["body"]}
+                wrap
+                maxWidthChars={36}
+                useMarkup
+                halign={START}
+              />,
+            ]
+          : [Summary]}
       </box>
     ) as Gtk.Box;
-
-    if (n.body) {
-      const Body = (
-        <label
-          label={n.body}
-          cssClasses={["body"]}
-          wrap
-          maxWidthChars={36}
-          useMarkup
-          halign={START}
-        />
-      );
-
-      Container.append(Body);
-    }
 
     return Container;
   }

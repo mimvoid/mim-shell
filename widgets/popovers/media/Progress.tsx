@@ -7,11 +7,9 @@ import Mpris from "gi://AstalMpris";
 const { START, END } = Gtk.Align;
 
 function lengthStr(length: number) {
-  const min = Math.floor(length / 60).toString();
-  const sec = Math.floor(length % 60)
-    .toString()
-    .padStart(2, "0");
-  return min + ":" + sec;
+  const min = Math.floor(length / 60);
+  const sec = (length - min * 60).toString().padStart(2, "0");
+  return `${min}:${sec}`;
 }
 
 export default (player: Mpris.Player) => {

@@ -73,9 +73,7 @@ function CalendarWidget() {
             popButton(self);
           }}
           onClicked={() => {
-            if (Cal.month > 0) {
-              Cal.month--;
-            } else {
+            if (--Cal.month < 0) {
               Cal.year--;
               Cal.month = 11;
             }
@@ -88,9 +86,7 @@ function CalendarWidget() {
             popButton(self);
           }}
           onClicked={() => {
-            if (Cal.month < 11) {
-              Cal.month++;
-            } else {
+            if (++Cal.month > 11) {
               Cal.year++;
               Cal.month = 0;
             }

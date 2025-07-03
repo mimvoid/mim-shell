@@ -29,7 +29,7 @@ const Slider = (
 // Only show slider on hover
 function SliderHover() {
   // Format volume as percentage
-  const label = bind(speaker, "volume").as((i) => `${Math.floor(i * 100)}%`);
+  const label = bind(speaker, "volume").as((i) => `${Math.trunc(i * 100)}%`);
 
   // Hitbox does not include the icon
   // Makes clicking on the icon button easier

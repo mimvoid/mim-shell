@@ -18,7 +18,7 @@ export default class Wallpapers extends GObject.Object {
     return this.instance;
   }
 
-  readonly wallpapers = this.fileInfo() || [];
+  readonly wallpapers = this.fileInfo();
 
   constructor() {
     super();
@@ -33,7 +33,7 @@ export default class Wallpapers extends GObject.Object {
 
   async setWallpaper(path: string) {
     execAsync(
-      `matugen image ${path} -t scheme-rainbow --contrast 0.5 -q`,
+      "matugen image " + path + " -t scheme-rainbow --contrast 0.5 -q",
     ).catch(console.error);
   }
 
@@ -42,7 +42,7 @@ export default class Wallpapers extends GObject.Object {
 
     try {
       // Get childen with a Gio.FileEnumerator object
-      const attrs = `${displayName},${fastContentType},${thumbnailPath}`;
+      const attrs = displayName + "," + fastContentType + "," + thumbnailPath;
       return wpGFile.enumerate_children(
         attrs,
         Gio.FileQueryInfoFlags.NONE,
@@ -51,32 +51,30 @@ export default class Wallpapers extends GObject.Object {
     } catch (err) {
       if (err === Gio.IOErrorEnum.NOT_FOUND) {
         wpGFile.make_directory();
-        return;
+      } else {
+        console.error(err);
       }
-
-      console.error(err);
-      return;
     }
   }
 
   private fileInfo() {
     const enumerator = this.wallpapersEnum();
-    if (!enumerator) return;
+    const info: string[][] = [];
 
-    const info = [];
+    if (enumerator) {
+      let file = enumerator.next_file(null);
+      while (file !== null) {
+        const type = file.get_attribute_as_string(fastContentType);
 
-    let file = enumerator.next_file(null);
-    while (file !== null) {
-      const type = file.get_attribute_as_string(fastContentType);
+        if (type?.startsWith("image")) {
+          info.push([
+            file.get_display_name(),
+            file.get_attribute_as_string(thumbnailPath) || "",
+          ]);
+        }
 
-      if (type?.startsWith("image")) {
-        info.push([
-          file.get_display_name(),
-          file.get_attribute_as_string(thumbnailPath),
-        ]);
+        file = enumerator.next_file(null);
       }
-
-      file = enumerator.next_file(null);
     }
 
     return info;
