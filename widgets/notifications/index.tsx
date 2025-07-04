@@ -1,57 +1,105 @@
-import { Astal, Gdk } from "astal/gtk4";
-import { timeout, bind } from "astal";
+import app from "ags/gtk4/app";
+import { For, createBinding, createState, onCleanup } from "ags";
+import { Astal, Gtk } from "ags/gtk4";
+import { timeout } from "ags/time";
 
 import Notifd from "gi://AstalNotifd";
 import { setLayerrules } from "@lib/utils";
 import Notification from "./notification";
 
-const notifd = Notifd.get_default();
-const TIMEOUT_DELAY = 5000;
-const WINDOW_NAME = "notification-window";
+export default () => {
+  const monitors = createBinding(app, "monitors");
 
-const Notifications = bind(notifd, "notifications").as((n) => {
-  if (notifd.dontDisturb) {
-    n = n.filter((notif) => notif.urgency === Notifd.Urgency.CRITICAL);
-  }
+  const notifd = Notifd.get_default();
+  const TIMEOUT_DELAY = 5000;
+  const WINDOW_NAME = "notification-window";
 
-  return n.map((notif) => {
-    const remove = timeout(TIMEOUT_DELAY, () => notif.dismiss());
-
-    return Notification({
-      notification: notif,
-      onHoverLeave: () => {
-        remove.cancel();
-        notif.dismiss();
-      },
-      setup: () => remove,
-    });
-  });
-});
-
-export default (gdkmonitor: Gdk.Monitor) => {
   const { TOP, RIGHT } = Astal.WindowAnchor;
 
-  return (
-    <window
-      setup={(self) =>
-        setLayerrules(self.namespace, [
-          "animation slidefade right",
-          "blur",
-          "ignorezero",
-          "xray 0",
-        ])
+  const [notifications, setNotifications] = createState(
+    new Array<Notifd.Notification>(),
+  );
+
+  const notifiedId = notifd.connect("notified", (notifdSrc, id, replaced) => {
+    const notification = notifdSrc.get_notification(id);
+    if (
+      notifdSrc.dontDisturb &&
+      !replaced &&
+      notification.urgency !== Notifd.Urgency.CRITICAL
+    ) {
+      return;
+    }
+
+    if (replaced) {
+      const notifs = notifications.get();
+
+      for (let i = 0, len = notifs.length; i < len; i++) {
+        if (notifs[i].id === id) {
+          notifs[i] = notification;
+          setNotifications(notifs);
+          return;
+        }
       }
-      name={WINDOW_NAME}
-      namespace={WINDOW_NAME}
-      cssClasses={["notification-popups"]}
-      gdkmonitor={gdkmonitor}
-      exclusivity={Astal.Exclusivity.EXCLUSIVE}
-      anchor={TOP | RIGHT}
-      visible={bind(notifd, "notifications").as((n) => Boolean(n[0]))}
-    >
-      <box cssClasses={["notifications"]} vertical>
-        {Notifications}
-      </box>
-    </window>
+    }
+
+    setNotifications((ns) => {
+      ns.unshift(notification);
+      return ns;
+    });
+  });
+
+  const resolvedId = notifd.connect("resolved", (_, id) => {
+    setNotifications((ns) => ns.filter((n) => n.id !== id));
+  });
+
+  onCleanup(() => {
+    notifd.disconnect(notifiedId);
+    notifd.disconnect(resolvedId);
+  });
+
+  const Notifications = (
+    <box class="notifications" orientation={Gtk.Orientation.VERTICAL}>
+      <For each={notifications}>
+        {(notif) => {
+          const remove = timeout(TIMEOUT_DELAY, () => notif.dismiss());
+          return (
+            <Notification
+              notification={notif}
+              onHoverLeave={() => {
+                remove.cancel();
+                notif.dismiss();
+              }}
+              setup={() => remove}
+            />
+          );
+        }}
+      </For>
+    </box>
+  );
+
+  return (
+    <For each={monitors} cleanup={(win) => (win as Gtk.Window).destroy()}>
+      {(monitor) => (
+        <window
+          $={(self) =>
+            setLayerrules(self.namespace, [
+              "animation slidefade right",
+              "blur",
+              "ignorezero",
+              "xray 0",
+            ])
+          }
+          visible={notifications((ns) => !!ns[0])}
+          name={WINDOW_NAME}
+          namespace={WINDOW_NAME}
+          class="notification-popups"
+          gdkmonitor={monitor}
+          exclusivity={Astal.Exclusivity.EXCLUSIVE}
+          anchor={TOP | RIGHT}
+        >
+          {Notifications}
+        </window>
+      )}
+    </For>
   );
 };

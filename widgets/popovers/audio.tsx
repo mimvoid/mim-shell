@@ -1,10 +1,12 @@
-import { bind } from "astal";
-import { Gtk, hook } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
+
 import { pointer, popButton, drawValuePercentage } from "@lib/utils";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
 const { START, CENTER, FILL } = Gtk.Align;
+const { VERTICAL } = Gtk.Orientation;
 
 const wp = Wp.get_default()!;
 const speaker = wp.audio.defaultSpeaker;
@@ -12,31 +14,25 @@ const microphone = wp.audio.defaultMicrophone;
 
 function Section(endpoint: Wp.Endpoint, name: string) {
   const lowerName = name.toLowerCase();
+  const mute = createBinding(endpoint, "mute");
 
-  function muteHook(button: Gtk.Button) {
-    if (endpoint.mute) {
-      button.tooltipText = `Unmute ${lowerName}`;
-      button.add_css_class("off");
-    } else {
-      button.tooltipText = `Mute ${lowerName}`;
-      button.remove_css_class("off");
-    }
-  }
   const Icon = (
     // Can mute or unmute
     <button
-      setup={(self) => {
+      $={(self) => {
         pointer(self);
         popButton(self);
 
-        muteHook(self);
-        hook(self, endpoint, "notify::mute", muteHook);
+        mute.subscribe(() =>
+          mute.get() ? self.add_css_class("off") : self.remove_css_class("off"),
+        );
       }}
-      cssClasses={["big-toggle"]}
+      class="big-toggle"
+      tooltipText={mute((m) => (m ? "Unmute " : "Mute ") + lowerName)}
       onClicked={() => (endpoint.mute = !endpoint.mute)}
     >
       <image
-        iconName={bind(endpoint, "volumeIcon")}
+        iconName={createBinding(endpoint, "volumeIcon")}
         iconSize={Gtk.IconSize.LARGE}
       />
     </button>
@@ -44,21 +40,23 @@ function Section(endpoint: Wp.Endpoint, name: string) {
 
   const Label = (
     <label
-      cssClasses={["description"]}
-      label={bind(endpoint, "description").as((d) => d || endpoint.name || "")}
+      class="description"
+      label={createBinding(endpoint, "description").as(
+        (d) => d || endpoint.name || "",
+      )}
       halign={START}
       hexpand
     />
   );
 
-  const Slider = (
+  const Slide = (
     <slider
-      setup={(self) => {
+      $={(self) => {
         pointer(self);
         drawValuePercentage(self);
       }}
-      value={bind(endpoint, "volume")}
-      onChangeValue={({ value }) => (endpoint.volume = value)}
+      value={createBinding(endpoint, "volume")}
+      onChangeValue={({ value }) => void (endpoint.volume = value)}
       valign={CENTER}
       hexpand
     />
@@ -67,32 +65,29 @@ function Section(endpoint: Wp.Endpoint, name: string) {
   return (
     <box
       cssClasses={["section", lowerName]}
+      orientation={VERTICAL}
       halign={FILL}
       valign={CENTER}
       hexpand
       vexpand
-      vertical
     >
-      <label cssClasses={["title"]} label={name} halign={START} />
+      <label class="title" label={name} halign={START} />
       <box>
         {Icon}
-        <box vertical valign={CENTER} hexpand vexpand>
+        <box orientation={VERTICAL} valign={CENTER} hexpand vexpand>
           {Label}
-          {Slider}
+          {Slide}
         </box>
       </box>
     </box>
   );
 }
 
-const Speaker = Section(speaker, "Speaker");
-const Microphone = Section(microphone, "Microphone");
-
-export default (
-  <PopRevealer cssClasses={["audio-popover"]} hasArrow={false}>
-    <box vertical>
-      {Speaker}
-      {Microphone}
+export default () => (
+  <PopRevealer class="audio-popover" hasArrow={false}>
+    <box orientation={VERTICAL}>
+      {Section(speaker, "Speaker")}
+      {Section(microphone, "Microphone")}
     </box>
   </PopRevealer>
 );

@@ -1,66 +1,51 @@
-import { bind } from "astal";
-import { Gtk } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
+
 import HoverRevealer from "@lib/widgets/HoverRevealer";
 import AudioPopover from "../popovers/audio";
+import { pointer, stepOnScroll, toPercentage } from "@lib/utils";
 
 const speaker = Wp.get_default()?.audio.defaultSpeaker!;
 
 // Can mute or unmute speaker
-const Icon = (
+const Icon = () => (
   <button
-    setup={(self) => self.set_cursor_from_name("pointer")}
+    $={pointer}
     onClicked={() => (speaker.mute = !speaker.mute)}
-    iconName={bind(speaker, "volumeIcon")}
-  />
-);
-
-// Control volume with slider
-const Slider = (
-  <slider
-    setup={(self) => self.set_cursor_from_name("pointer")}
-    value={bind(speaker, "volume")}
-    onChangeValue={({ value }) => (speaker.volume = value)}
-    valign={Gtk.Align.CENTER}
-    hexpand
+    iconName={createBinding(speaker, "volumeIcon")}
   />
 );
 
 // Only show slider on hover
 function SliderHover() {
-  // Format volume as percentage
-  const label = bind(speaker, "volume").as((i) => `${Math.trunc(i * 100)}%`);
+  // Control volume with slider
+  const Slide = (
+    <slider
+      $={pointer}
+      value={createBinding(speaker, "volume")}
+      valign={Gtk.Align.CENTER}
+      hexpand
+    >
+      <Gtk.EventControllerScroll onScroll={stepOnScroll} />
+    </slider>
+  );
 
   // Hitbox does not include the icon
-  // Makes clicking on the icon button easier
+  // (which makes clicking on the icon button easier)
   return (
     <menubutton>
-      <HoverRevealer
-        hiddenChild={Slider}
-        onScroll={(_, __, dy) => {
-          const step = 0.05;
-
-          if (dy < 0) {
-            speaker.volume <= 1 - step
-              ? (speaker.volume += step)
-              : (speaker.volume = 1);
-          } else {
-            speaker.volume >= step
-              ? (speaker.volume -= step)
-              : (speaker.volume = 0);
-          }
-        }}
-      >
-        {label}
+      <HoverRevealer hiddenChild={Slide}>
+        <label label={createBinding(speaker, "volume").as(toPercentage)} />
       </HoverRevealer>
-      {AudioPopover}
+      <AudioPopover />
     </menubutton>
   );
 }
 
 export default () => (
-  <box cssClasses={["sound", "icon-label"]}>
-    {Icon}
+  <box class="sound icon-label">
+    <Icon />
     <SliderHover />
   </box>
 );

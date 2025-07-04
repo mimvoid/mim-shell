@@ -1,43 +1,34 @@
-import { bind } from "astal";
-import { Gtk } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import WlSunset from "./wlsunset";
 
 import Brightness from "@services/brightness";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
-import { drawValuePercentage } from "@lib/utils";
+import { drawValuePercentage, pointer } from "@lib/utils";
 
 // Brightness label & slider
-
-const brightness = Brightness.get_default();
-
 function BrightnessBox() {
+  const brightness = Brightness.get_default();
+
   // Change brightness on drag
   const Slider = (
     <slider
-      setup={(self) => {
-        self.set_cursor_from_name("pointer");
+      $={(self) => {
+        pointer(self);
         drawValuePercentage(self);
       }}
-      value={bind(brightness, "light")}
-      onChangeValue={({ value }) => (brightness.light = value)}
+      value={createBinding(brightness, "light")}
       valign={Gtk.Align.CENTER}
       hexpand
+      onChangeValue={({ value }) => void (brightness.light = value)}
     />
   );
 
-  return (
-    <HoverRevealer
-      hiddenChild={Slider}
-      onScroll={(_, __, dy) =>
-        // Change brightness by scrolling
-        dy < 0 ? (brightness.light += 0.05) : (brightness.light -= 0.05)
-      }
-    />
-  );
+  return <HoverRevealer hiddenChild={Slider} />;
 }
 
 export default () => (
-  <box cssClasses={["brightness"]}>
+  <box class="brightness">
     <WlSunset />
     <BrightnessBox />
   </box>

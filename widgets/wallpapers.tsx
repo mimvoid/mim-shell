@@ -1,8 +1,8 @@
-import { Astal, App, Gtk, Gdk } from "astal/gtk4";
+import app from "ags/gtk4/app";
+import { Astal, Gtk, Gdk } from "ags/gtk4";
 import Gio from "gi://Gio";
 
 import { pointer, setLayerrules } from "@lib/utils";
-import { ScrolledWindow, Picture } from "@lib/astalified";
 import Wallpapers from "@services/wallpapers";
 
 export default () => {
@@ -11,49 +11,60 @@ export default () => {
 
   const wallpapers = Wallpapers.get_default();
 
-  const Choices = wallpapers.wallpapers.map(([fileName, thumbnail]) => (
-    <button
-      setup={pointer}
-      cssClasses={["item"]}
-      onClicked={() => wallpapers.setWallpaper(Wallpapers.directory + fileName)}
-    >
-      <box vertical spacing={8}>
-        <overlay>
-          <box heightRequest={120} widthRequest={240} />
-          <Picture
-            type="overlay clip measure"
-            file={Gio.File.new_for_path(
-              !!thumbnail ? thumbnail : Wallpapers.directory + fileName,
-            )}
-          />
-        </overlay>
-        <label cssClasses={["filename"]} label={fileName} />
-      </box>
-    </button>
-  ));
+  const Choices = wallpapers.wallpapers.map(([fileName, thumbnail]) => {
+    let Pic: Gtk.Picture;
+    return (
+      <button
+        $={pointer}
+        class="item"
+        onClicked={() =>
+          wallpapers.setWallpaper(Wallpapers.directory + fileName)
+        }
+      >
+        <box orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+          <overlay $={(self) => {
+            self.set_measure_overlay(Pic, true)
+            self.set_clip_overlay(Pic, true);
+          }}>
+            <box heightRequest={120} widthRequest={240} />
+            <Gtk.Picture
+              $={(self) => (Pic = self)}
+              $type="overlay"
+              file={Gio.File.new_for_path(
+                thumbnail || Wallpapers.directory + fileName,
+              )}
+            />
+          </overlay>
+          <label class="filename" label={fileName} />
+        </box>
+      </button>
+    );
+  });
 
   return (
     <window
-      setup={(self) => {
+      $={(self) => {
         setLayerrules(self.namespace, ["blur", "ignorezero", "xray 0"]);
-        self.child.widthRequest = App.get_monitors()[0].geometry.width;
+        self.child.widthRequest = app.get_monitors()[0].geometry.width;
       }}
       name="wallpaperPicker"
       namespace="wallpaper-picker"
-      cssClasses={["wallpaper-picker", "popover"]}
+      class="wallpaper-picker popover"
+      visible
       anchor={BOTTOM | LEFT | RIGHT}
       layer={Astal.Layer.OVERLAY}
-      exclusivity={Astal.Exclusivity.NORMAL}
       keymode={Astal.Keymode.EXCLUSIVE}
-      onKeyPressed={({ name }, keyval) => {
-        if (keyval === Gdk.KEY_Escape) App.toggle_window(name);
-      }}
-      application={App}
       marginBottom={12}
+      application={app}
     >
-      <ScrolledWindow hscrollbarPolicy={EXTERNAL} vscrollbarPolicy={NEVER}>
+      <Gtk.EventControllerKey
+        onKeyPressed={({ widget }, keyval) => {
+          if (keyval === Gdk.KEY_Escape) app.toggle_window(widget.name);
+        }}
+      />
+      <scrolledwindow hscrollbarPolicy={EXTERNAL} vscrollbarPolicy={NEVER}>
         <box spacing={8}>{Choices}</box>
-      </ScrolledWindow>
+      </scrolledwindow>
     </window>
   ) as Gtk.Window;
 };

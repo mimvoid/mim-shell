@@ -1,19 +1,20 @@
-// Taken from hyprpanel:
-// https://github.com/Jas-SinghFSU/HyprPanel/blob/master/src/lib/variables.ts
-
-import { Variable } from "astal";
+import { createPoll } from "ags/time";
 import GLib from "gi://GLib";
 
-export const time = Variable(GLib.DateTime.new_now_local()).poll(
-  1000,
-  (): GLib.DateTime => GLib.DateTime.new_now_local(),
-);
+export function pollTime() {
+  return createPoll(GLib.DateTime.new_now_local(), 1000, () =>
+    GLib.DateTime.new_now_local(),
+  );
+}
 
-export const uptime = Variable(0).poll(
-  60_00,
-  "cat /proc/uptime",
-  (line): number => parseInt(line.split(".", 1)[0]) / 60,
-);
+export function pollUptime() {
+  return createPoll(
+    0,
+    60_00,
+    "cat /proc/uptime",
+    (line) => parseInt(line.split(".", 1)[0]) / 60,
+  );
+}
 
 export const distro = {
   name: GLib.get_os_info("NAME"),

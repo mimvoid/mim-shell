@@ -1,15 +1,13 @@
-import { Astal, Widget, Gtk } from "astal/gtk4";
-import GObject from "astal/gobject";
+import { Astal, Gtk } from "ags/gtk4";
+import GObject, { register } from "ags/gobject";
+import { pointer } from "@lib/utils";
 
-interface DropdownProps extends Widget.RevealerProps {
-  label: Gtk.Widget;
+interface DropdownProps extends Gtk.Revealer.ConstructorProps {
+  label: GObject.Object | string;
 }
 
+@register({ GTypeName: "Dropdown" })
 export default class Dropdown extends Astal.Box {
-  static {
-    GObject.registerClass({ GTypeName: "Dropdown" }, this);
-  }
-
   constructor({
     child,
     label,
@@ -17,9 +15,11 @@ export default class Dropdown extends Astal.Box {
     transitionDuration = 250,
     transitionType = Gtk.RevealerTransitionType.SLIDE_DOWN,
     ...props
-  }: DropdownProps) {
+  }: Partial<DropdownProps>) {
     super({
-      cssClasses: ["dropdown", "section", revealChild ? "open" : "closed"],
+      cssClasses: revealChild
+        ? ["dropdown", "section", "open"]
+        : ["dropdown", "section"],
       vertical: true,
     });
 
@@ -28,34 +28,35 @@ export default class Dropdown extends Astal.Box {
         revealChild={revealChild}
         transitionDuration={transitionDuration}
         transitionType={transitionType}
-        child={child}
+        onNotifyRevealChild={({ reveal_child }) =>
+          reveal_child
+            ? this.add_css_class("open")
+            : this.remove_css_class("open")
+        }
         {...props}
-      />
+      >
+        {child}
+      </revealer>
     ) as Gtk.Revealer;
 
-    Revealer.connect("notify::reveal-child", ({ reveal_child }) => {
-      if (reveal_child) {
-        this.remove_css_class("closed");
-        this.add_css_class("open");
-      } else {
-        this.remove_css_class("open");
-        this.add_css_class("closed");
-      }
-    });
-
-    this.children = [
-      <button
-        setup={(self) => self.set_cursor_from_name("pointer")}
-        onClicked={() => (Revealer.revealChild = !Revealer.revealChild)}
-        hexpand
-        child={
+    this.set_children([
+      (
+        <button
+          $={pointer}
+          onClicked={() => (Revealer.revealChild = !Revealer.revealChild)}
+          hexpand
+        >
           <box spacing={6}>
             <image iconName="pan-down-symbolic" />
-            {label}
+            {label instanceof Gtk.Widget ? (
+              label
+            ) : (
+              <label label={label?.toString()} />
+            )}
           </box>
-        }
-      />,
+        </button>
+      ) as Gtk.Button,
       Revealer,
-    ];
+    ]);
   }
 }

@@ -1,19 +1,18 @@
-import { App, Gtk } from "astal/gtk4";
+import app from "ags/gtk4/app";
+import { Gtk } from "ags/gtk4";
 import Icons from "@lib/icons";
 import Wallpapers from "../../wallpapers";
+import { pointer } from "@lib/utils";
 
-const WallpapersLauncher = (
+const WallpapersLauncher = () => (
   <button
-    setup={(self) => self.set_cursor_from_name("pointer")}
+    $={pointer}
     onClicked={() => {
-      const existingWin = App.get_window("wallpaperPicker");
-
+      const existingWin = app.get_window("wallpaperPicker");
       if (existingWin) {
         existingWin.visible = true;
       } else {
-        const WpWindow = Wallpapers();
-        App.add_window(WpWindow);
-        WpWindow.visible = true;
+        app.add_window(Wallpapers());
       }
     }}
   >
@@ -25,7 +24,7 @@ const WallpapersLauncher = (
 );
 
 export default () => (
-  <box cssClasses={["launchers", "section"]} spacing={10} hexpand>
-    {WallpapersLauncher}
+  <box class="launchers section" spacing={10} hexpand>
+    <WallpapersLauncher />
   </box>
 );

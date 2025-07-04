@@ -1,34 +1,37 @@
-import { timeout } from "astal";
-import { Astal, Gtk, hook } from "astal/gtk4";
+import { Astal, Gtk } from "ags/gtk4";
+import { timeout } from "ags/time";
 import AstalHyprland from "gi://AstalHyprland";
 
 export function pointer(self: Gtk.Widget) {
   self.set_cursor_from_name("pointer");
 }
 
-function popHook(button: Gtk.Button) {
-  button.add_css_class("pop");
-  timeout(100, () => button.remove_css_class("pop"));
+function popConn(widget: Gtk.Widget) {
+  widget.add_css_class("pop");
+  timeout(100, () => widget.remove_css_class("pop"));
 }
-export function popButton(self: Gtk.Button) {
-  hook(self, self, "clicked", popHook);
+export function popButton(button: Gtk.Button) {
+  button.connect("clicked", popConn);
 }
-
-function popMenuHook(mButton: Gtk.MenuButton) {
-  mButton.add_css_class("pop");
-  timeout(100, () => mButton.remove_css_class("pop"));
-}
-export function popMenuButton(self: Gtk.MenuButton, popover: Gtk.Popover) {
-  hook(self, popover, "show", popMenuHook);
+export function popMenuButton(mButton: Gtk.MenuButton) {
+  mButton.popover.connect("show", (popover) => popConn(popover.parent));
 }
 
+export function toPercentage(value: number) {
+  return `${Math.trunc(value * 100)}%`;
+}
 export function drawValuePercentage(w: Gtk.Scale) {
   w.drawValue = true;
   w.valuePos = Gtk.PositionType.RIGHT;
-  w.set_format_value_func((_, value) => `${Math.trunc(value * 100)}%`);
+  w.set_format_value_func((_, value) => toPercentage(value));
 }
 
-export function stepOnScroll(slider: Astal.Slider, _: number, dy: number) {
+export function stepOnScroll(
+  { widget }: Gtk.EventControllerScroll,
+  _: number,
+  dy: number,
+) {
+  const slider = widget as Astal.Slider;
   dy < 0 ? (slider.value += slider.step) : (slider.value -= slider.step);
 }
 

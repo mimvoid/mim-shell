@@ -1,37 +1,37 @@
-import { bind } from "astal";
-import { Gtk, Widget } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
+import GLib from "gi://GLib?version=2.0";
 
-import { Calendar } from "@lib/astalified";
 import PopRevealer from "@lib/widgets/PopRevealer";
-import { time, uptime } from "@lib/variables";
+import { pollTime, pollUptime } from "@lib/variables";
 import { pointer, popButton } from "@lib/utils";
 import Icon from "@lib/icons";
 
 const { START, CENTER, END } = Gtk.Align;
+const { VERTICAL } = Gtk.Orientation;
 
-interface TimeLabelProps extends Widget.LabelProps {
-  cssClass: string;
-  fmt: string;
-}
-
-function TimeLabel({ cssClass, fmt, ...props }: TimeLabelProps) {
-  return (
-    <label
-      label={bind(time).as((time) => time.format(fmt) || "")}
-      cssClasses={["display", cssClass]}
-      {...props}
-    />
-  );
+function fmt(format: string) {
+  return (dt: GLib.DateTime) => dt.format(format) || "";
 }
 
 function Time() {
+  const time = pollTime();
+  const uptime = pollUptime();
+
+  let Minute: Gtk.Label;
   const MajorTime = (
-    <overlay>
-      <TimeLabel cssClass="hour" fmt="%H" halign={START} valign={START} />
-      <TimeLabel
-        type="overlay measure"
-        cssClass="minute"
-        fmt="%M"
+    <overlay $={(self) => self.set_measure_overlay(Minute, true)}>
+      <label
+        class="display hour"
+        label={time(fmt("%H"))}
+        halign={START}
+        valign={START}
+      />
+      <label
+        $={(self) => (Minute = self)}
+        $type="overlay"
+        class="display minute"
+        label={time(fmt("%M"))}
         halign={END}
         valign={END}
       />
@@ -40,19 +40,22 @@ function Time() {
 
   const Uptime = (
     <label
-      label={bind(uptime).as(
-        (t) => `Up: ${Math.floor(t / 60)}h ${Math.floor(t % 60)}m`,
-      )}
-      cssClasses={["uptime"]}
+      label={uptime((t) => `Up: ${Math.trunc(t / 60)}h ${Math.trunc(t % 60)}m`)}
+      class="uptime"
       halign={START}
     />
   );
 
   return (
-    <box cssClasses={["big-clock"]} halign={CENTER} hexpand>
+    <box class="big-clock" halign={CENTER} hexpand>
       {MajorTime}
-      <box cssClasses={["minor-time"]} valign={END} vertical>
-        <TimeLabel cssClass="second" fmt="%S" halign={START} valign={END} />
+      <box class="minor-time" valign={END} orientation={VERTICAL}>
+        <label
+          class="display second"
+          label={time(fmt("%S"))}
+          halign={START}
+          valign={END}
+        />
         {Uptime}
       </box>
     </box>
@@ -60,76 +63,74 @@ function Time() {
 }
 
 function CalendarWidget() {
-  const Cal = (
-    <Calendar showHeading={false} showDayNames showWeekNumbers />
-  ) as Gtk.Calendar;
+  function setupButton(self: Gtk.Button) {
+    pointer(self);
+    popButton(self);
+  }
+
+  const Cal = new Gtk.Calendar({
+    showHeading: false,
+    showDayNames: true,
+    showWeekNumbers: true,
+  });
+
+  const month = createBinding(Cal, "month").as(
+    () => Cal.get_date().format("%B") || "",
+  );
+  const year = createBinding(Cal, "year").as((y) => String(y));
 
   const Header = (
-    <box cssClasses={["header"]}>
-      <box cssClasses={["month-switcher"]} hexpand>
+    <box class="header">
+      <box class="month-switcher" hexpand>
         <button
-          setup={(self) => {
-            pointer(self);
-            popButton(self);
-          }}
+          $={setupButton}
+          iconName={Icon.nav.previous}
           onClicked={() => {
             if (--Cal.month < 0) {
               Cal.year--;
               Cal.month = 11;
             }
           }}
-          iconName={Icon.nav.previous}
         />
         <button
-          setup={(self) => {
-            pointer(self);
-            popButton(self);
-          }}
+          $={setupButton}
+          iconName={Icon.nav.next}
           onClicked={() => {
             if (++Cal.month > 11) {
               Cal.year++;
               Cal.month = 0;
             }
           }}
-          iconName={Icon.nav.next}
         />
-        <label
-          label={bind(Cal, "month").as(() => Cal.get_date().format("%B") || "")}
-        />
+        <label label={month} />
       </box>
-      <box cssClasses={["year-switcher"]}>
-        <label label={bind(Cal, "year").as((y) => String(y))} />
+      <box class="year-switcher">
+        <label label={year} />
         <button
-          setup={(self) => {
-            pointer(self);
-            popButton(self);
-          }}
-          onClicked={() => Cal.year--}
+          $={setupButton}
           iconName={Icon.nav.previous}
+          onClicked={() => Cal.year--}
         />
         <button
-          setup={(self) => {
-            pointer(self);
-            popButton(self);
-          }}
-          onClicked={() => Cal.year++}
+          $={setupButton}
           iconName={Icon.nav.next}
+          onClicked={() => Cal.year++}
         />
       </box>
     </box>
   );
 
   return (
-    <box cssClasses={["calendar-wrapper"]} vertical>
+    <box class="calendar-wrapper" orientation={VERTICAL}>
       {Header}
       {Cal}
     </box>
   );
 }
 
-export default (
+export default () => (
   <PopRevealer name="calendar" hasArrow={false}>
-    <box cssClasses={["calendar"]} halign={CENTER} vertical>
+    <box class="calendar" halign={CENTER} orientation={VERTICAL}>
       <Time />
       <CalendarWidget />
     </box>

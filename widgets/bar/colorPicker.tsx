@@ -1,73 +1,68 @@
-import { bind } from "astal";
-import { Gdk, Gtk, hook } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk, Gdk } from "ags/gtk4";
 
 import Picker from "@services/colorpicker";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
-import { ColorDialogButton } from "@lib/astalified";
 import Icons from "@lib/icons";
+import { pointer } from "@lib/utils";
 import ColorsPopover from "../popovers/colors";
 
-const picker = Picker.get_default();
+export default () => {
+  const picker = Picker.get_default();
+  const lastColor = createBinding(picker, "colors").as(
+    (c) => c.at(-1) || "#000000",
+  );
 
-const Trigger = (
-  <button
-    setup={(self) => self.set_cursor_from_name("pointer")}
-    cssClasses={["color-button"]}
-    onClicked={() => picker.pick()}
-    tooltipText={bind(picker, "colors").as(
-      (c) => `Last color: ${c.at(-1) || "#000000"}`,
-    )}
-    iconName={Icons.colorpicker}
-  />
-);
-
-function Color() {
-  function colorHook(cButton: Gtk.ColorDialogButton) {
-    const gRgb = new Gdk.RGBA();
-    if (gRgb.parse(picker.colors.at(-1) || "#000000")) {
-      cButton.rgba = gRgb;
-    } else if (!cButton.rgba) {
-      gRgb.red = 0;
-      gRgb.green = 0;
-      gRgb.blue = 0;
-      gRgb.alpha = 1;
-      cButton.rgba = gRgb;
-    }
-  }
-
-  // A circle showing the last picked color
-  const colorDisplay = (
-    <ColorDialogButton
-      setup={(self) => {
-        colorHook(self);
-        hook(self, picker, "notify::colors", colorHook);
-      }}
-      cssClasses={["color-display"]}
+  const Trigger = (
+    <button
+      $={pointer}
+      class="color-button"
+      onClicked={() => picker.pick()}
+      tooltipText={lastColor((c) => "Last color: " + c)}
+      iconName={Icons.colorpicker}
     />
   );
 
-  // Include a color label and the circle
-  return (
-    <menubutton>
-      <HoverRevealer
-        hiddenChild={
-          <box cssClasses={["color-box"]}>
-            <label
-              label={bind(picker, "colors").as((c) => c.at(-1) || "#000000")}
-            />
-            {colorDisplay}
-          </box>
-        }
-      >
-        {Trigger}
-      </HoverRevealer>
-      {ColorsPopover}
-    </menubutton>
-  );
-}
+  function Color() {
+    function colorSub(self: Gtk.ColorDialogButton) {
+      const newRgba = new Gdk.RGBA();
+      if (newRgba.parse(lastColor.get())) {
+        self.rgba = newRgba;
+      }
+    }
 
-export default () => (
-  <box cssClasses={["colorpicker"]}>
-    <Color />
-  </box>
-);
+    // A circle showing the last picked color
+    const colorDisplay = (
+      <Gtk.ColorDialogButton
+        $={(self) => {
+          colorSub(self);
+          lastColor.subscribe(() => colorSub(self));
+        }}
+        class="color-display"
+      />
+    );
+
+    // Include a color label and the circle
+    return (
+      <menubutton>
+        <HoverRevealer
+          hiddenChild={
+            <box class="color-box">
+              <label label={lastColor} />
+              {colorDisplay}
+            </box>
+          }
+        >
+          {Trigger}
+        </HoverRevealer>
+        <ColorsPopover />
+      </menubutton>
+    );
+  }
+
+  return (
+    <box class="colorpicker">
+      <Color />
+    </box>
+  );
+};

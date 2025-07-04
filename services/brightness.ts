@@ -1,6 +1,6 @@
-import GObject, { register, property } from "astal/gobject";
-import { monitorFile, readFileAsync } from "astal/file";
-import { exec, execAsync } from "astal";
+import GObject, { register, getter, setter } from "ags/gobject";
+import { monitorFile, readFileAsync } from "ags/file";
+import { exec, execAsync } from "ags/process";
 
 @register({ GTypeName: "Brightness" })
 export default class Brightness extends GObject.Object {
@@ -30,11 +30,12 @@ export default class Brightness extends GObject.Object {
     });
   }
 
-  @property(Number)
+  @getter(Number)
   get light() {
     return this.#light;
   }
 
+  @setter(Number)
   set light(percent) {
     // Check for limits
     if (percent < 0) percent = 0;

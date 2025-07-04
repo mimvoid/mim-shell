@@ -1,6 +1,9 @@
-import { execAsync, bind } from "astal";
+import { createBinding } from "ags";
+import { execAsync } from "ags/process";
 import Network from "gi://AstalNetwork";
+
 import HoverRevealer from "@lib/widgets/HoverRevealer";
+import { pointer } from "@lib/utils";
 import NetworkPopover from "../popovers/network";
 
 const network = Network.get_default();
@@ -8,21 +11,19 @@ const network = Network.get_default();
 export default () => {
   const Icon = (
     <button
-      setup={(self) => self.set_cursor_from_name("pointer")}
+      $={pointer}
       onClicked={() => execAsync("networkmanager_dmenu")}
-      tooltipText={bind(network.wifi, "strength").as((i) => `${i}%`)}
-      iconName={bind(network.wifi, "iconName")}
+      tooltipText={createBinding(network.wifi, "strength").as((i) => `${i}%`)}
+      iconName={createBinding(network.wifi, "iconName")}
     />
   );
 
-  const Label = <label label={bind(network.wifi, "ssid")} />;
+  const Label = <label label={createBinding(network.wifi, "ssid")} />;
 
   return (
-    <menubutton cssClasses={["network"]}>
-      <HoverRevealer hiddenChild={Label}>
-        {Icon}
-      </HoverRevealer>
-      {NetworkPopover}
+    <menubutton class="network">
+      <HoverRevealer hiddenChild={Label}>{Icon}</HoverRevealer>
+      <NetworkPopover />
     </menubutton>
   );
 };

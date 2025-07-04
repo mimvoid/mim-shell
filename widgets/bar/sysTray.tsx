@@ -1,86 +1,94 @@
-import { bind } from "astal";
-import { Gtk, hook } from "astal/gtk4";
+import { createBinding, For } from "ags";
+import { Gtk } from "ags/gtk4";
 import Tray from "gi://AstalTray";
 import Icon from "@lib/icons";
+import { pointer } from "@lib/utils";
 
-const tray = Tray.get_default();
-
-function TrayIcons() {
-  // Create buttons for every system tray item
-  const Items = bind(tray, "items").as((items) =>
-    items.map((item) => (
-      <menubutton
-        cssClasses={["system-tray-item"]}
-        tooltipMarkup={bind(item, "tooltipMarkup")}
-        actionGroup={bind(item, "actionGroup").as((ag) => ["dbusmenu", ag])}
-        menuModel={bind(item, "menuModel")}
-      >
-        <image
-          setup={(self) => self.set_cursor_from_name("pointer")}
-          gicon={bind(item, "gicon")}
-        />
-      </menubutton>
-    )),
+function setupTrayItem(self: Gtk.MenuButton, item: Tray.TrayItem) {
+  self.insert_action_group("dbusmenu", item.action_group);
+  item.connect("notify::action-group", (itemSrc) =>
+    self.insert_action_group("dbusMenu", itemSrc.action_group),
   );
-
-  // Wrap them all in a box
-  return <box spacing={8}>{Items}</box>;
 }
 
-// Display system tray after clicking on a button
-const Revealer = (
-  <revealer
-    transitionDuration={250}
-    transitionType={Gtk.RevealerTransitionType.SLIDE_LEFT}
-  >
-    <TrayIcons />
-  </revealer>
-) as Gtk.Revealer;
+export default () => {
+  const tray = Tray.get_default();
+  const items = createBinding(tray, "items");
 
-function SysTrayToggle() {
-  const ToggleIcon = (
-    <image
-      setup={(self) =>
-        hook(self, Revealer, "notify::reveal-child", (img) =>
-          Revealer.revealChild
-            ? img.add_css_class("open")
-            : img.remove_css_class("open"),
-        )
-      }
-      cssClasses={["hider"]}
-      iconName={Icon.hider}
-    />
+  // Create buttons for every system tray item
+  const TrayIcons = (
+    <box spacing={8}>
+      <For each={items}>
+        {(item) => (
+          <menubutton
+            $={(self) => setupTrayItem(self, item)}
+            class="system-tray-item"
+            tooltipMarkup={createBinding(item, "tooltipMarkup")}
+            menuModel={item.menuModel}
+          >
+            <image $={pointer} gicon={createBinding(item, "gicon")} />
+          </menubutton>
+        )}
+      </For>
+    </box>
   );
-  const Indicator = <box cssClasses={["indicator"]} />;
+
+  const ToggleIcon = new Gtk.Image({
+    cssClasses: ["hider"],
+    iconName: Icon.hider,
+  });
+
+  // Display system tray after clicking on a button
+  const Revealer = (
+    <revealer
+      transitionDuration={250}
+      transitionType={Gtk.RevealerTransitionType.SLIDE_LEFT}
+      onNotifyRevealChild={({ reveal_child }) =>
+        reveal_child
+          ? ToggleIcon.add_css_class("open")
+          : ToggleIcon.remove_css_class("open")
+      }
+    >
+      {TrayIcons}
+    </revealer>
+  ) as Gtk.Revealer;
 
   // Don't actually include the revealer in the hitbox
-  return (
+  const SysTrayToggle = (
     <button
-      setup={(self) => {
-        self.set_cursor_from_name("pointer");
-        if (tray.items && tray.items[0]) self.add_css_class("non-empty");
+      $={(self) => {
+        pointer(self);
 
-        hook(self, tray, "item-added", (b) => {
-          if (!b.has_css_class("non-empty")) b.add_css_class("non-empty");
+        const itemAddedId = tray.connect("item-added", (traySrc) => {
+          if (!traySrc.items[1]) {
+            self.add_css_class("non-empty"); // The tray was empty before
+          }
         });
-        hook(self, tray, "item-removed", (b) => {
-          if (!tray.items || !tray.items[0]) b.remove_css_class("non-empty");
-        })
+        const itemRemovedId = tray.connect("item-removed", (traySrc) => {
+          if (!traySrc.items[0]) {
+            self.remove_css_class("non-empty"); // The tray is now empty
+          }
+        });
+
+        self.connect("destroy", () => {
+          tray.disconnect(itemAddedId);
+          tray.disconnect(itemRemovedId);
+        });
       }}
-      cssClasses={["hider-wrapper"]}
+      class={tray.items[0] ? "hider-wrapper non-empty" : "hider-wrapper"}
       onClicked={() => (Revealer.revealChild = !Revealer.revealChild)}
     >
       <box>
-        {Indicator}
+        <box class="indicator" />
         {ToggleIcon}
       </box>
     </button>
   );
-}
 
-export default () => (
-  <box cssClasses={["system-tray"]}>
-    {Revealer}
-    <SysTrayToggle />
-  </box>
-);
+  return (
+    <box class="system-tray">
+      {Revealer}
+      {SysTrayToggle}
+    </box>
+  );
+};

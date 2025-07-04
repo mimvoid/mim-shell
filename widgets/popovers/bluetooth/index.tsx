@@ -1,97 +1,93 @@
-import { execAsync, bind } from "astal";
-import { Gtk, hook } from "astal/gtk4";
+import { createBinding, For } from "ags";
+import { Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
 import Bluetooth from "gi://AstalBluetooth";
 
 import Icon from "@lib/icons";
 import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
-import { connectedDevices, disconnectedDevices } from "./DeviceItem";
+import Devices from "./Devices";
 
 const bluetooth = Bluetooth.get_default();
 const { START, CENTER } = Gtk.Align;
+const { VERTICAL } = Gtk.Orientation;
 
 function Status() {
-  const action = () =>
-    execAsync(`bluetooth ${bluetooth.isPowered ? "off" : "on"}`);
+  const onClicked = () =>
+    execAsync("bluetooth " + (bluetooth.isPowered ? "off" : "on"));
 
-  // Display icon depending on Bluetooth status
-  const icon = bind(bluetooth, "isPowered").as(
-    (p) => Icon.bluetooth[p ? "enabled" : "disabled"],
-  );
-
-  function powerHook(button: Gtk.Button) {
-    if (bluetooth.isPowered) {
-      button.tooltipText = "Turn off Bluetooth";
-      button.remove_css_class("off");
-    } else {
-      button.tooltipText = "Turn on Bluetooth";
-      button.add_css_class("off");
-    }
-  }
+  const powered = createBinding(bluetooth, "isPowered");
 
   return (
-    <box cssClasses={["status", "section"]}>
+    <box class="status section">
       <button
-        setup={(self) => {
+        $={(self) => {
           pointer(self);
           popButton(self);
-
-          powerHook(self);
-          hook(self, bluetooth, "notify::is-powered", powerHook);
         }}
-        cssClasses={["big-toggle"]}
-        onClicked={action}
+        class={powered((p) => (p ? "big-toggle" : "big-toggle off"))}
+        tooltipText={powered((p) =>
+          p ? "Turn off Bluetooth" : "Turn on Bluetooth",
+        )}
+        onClicked={onClicked}
       >
-        <image iconName={icon} iconSize={Gtk.IconSize.LARGE} />
+        <image
+          iconName={powered((p) => Icon.bluetooth[p ? "on" : "off"])}
+          iconSize={Gtk.IconSize.LARGE}
+        />
       </button>
-      <box valign={CENTER} vertical>
+      <box valign={CENTER} orientation={VERTICAL}>
         <label
-          label={bind(bluetooth, "adapter").as((a) => a.name)}
+          label={createBinding(bluetooth, "adapter").as((a) => a.name)}
           halign={START}
         />
-        <label
-          label={bind(bluetooth, "isPowered").as((p) => (p ? "On" : "Off"))}
-          halign={START}
-        />
+        <label label={powered((p) => (p ? "On" : "Off"))} halign={START} />
       </box>
     </box>
   );
 }
 
-function Connected() {
-  const DefaultLabel = <label label="None connected" halign={START} />;
+export default () => {
+  const [connectedDevices, disconnectedDevices] = Devices();
 
-  return (
-    <box
-      cssClasses={["section", "connected"]}
-      vertical
-      onDestroy={() => connectedDevices.drop()}
-    >
-      <label cssClasses={["title"]} label="Connected" halign={START} />
-      {bind(connectedDevices).as((d) =>
-        d[0] ? <box vertical>{d}</box> : DefaultLabel,
-      )}
+  function Connected() {
+    const hasConnected = connectedDevices((d) => !!d[0]);
+
+    const DefaultLabel = (
+      <label
+        label="None connected"
+        halign={START}
+        visible={hasConnected((c) => !c)}
+      />
+    );
+
+    return (
+      <box class="section connected" orientation={Gtk.Orientation.VERTICAL}>
+        <label class="title" label="Connected" halign={START} />
+        <box orientation={VERTICAL} visible={hasConnected}>
+          <For each={connectedDevices}>{(d) => d}</For>
+        </box>
+        {DefaultLabel}
+      </box>
+    );
+  }
+
+  const Disconnected = (
+    <box class="section disconnected" orientation={VERTICAL}>
+      <label class="title" label="Disconnected" halign={START} />
+      <box orientation={VERTICAL}>
+        <For each={disconnectedDevices}>{(d) => d}</For>
+      </box>
     </box>
   );
-}
 
-const Disconnected = (
-  <box
-    cssClasses={["section", "disconnected"]}
-    vertical
-    onDestroy={() => disconnectedDevices.drop()}
-  >
-    <label cssClasses={["title"]} label="Disconnected" halign={START} />
-    <box vertical>{disconnectedDevices()}</box>
-  </box>
-);
-
-export default (
-  <PopRevealer cssClasses={["bluetooth-popover"]} hasArrow={false}>
-    <box vertical>
-      <Status />
-      <Connected />
-      {Disconnected}
-    </box>
-  </PopRevealer>
-);
+  return (
+    <PopRevealer class="bluetooth-popover" hasArrow={false}>
+      <box orientation={VERTICAL}>
+        <Status />
+        <Connected />
+        {Disconnected}
+      </box>
+    </PopRevealer>
+  );
+};

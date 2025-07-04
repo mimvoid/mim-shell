@@ -1,14 +1,16 @@
+import { Gtk } from "ags/gtk4";
+
 import PickerList from "./PickerList";
 import Converter from "./Converter";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
-export default (
+export default () => (
   <PopRevealer
-    cssClasses={["colors-popover"]}
     name="colorsPopover"
+    class="colors-popover"
     hasArrow={false}
   >
-    <box vertical>
+    <box orientation={Gtk.Orientation.VERTICAL}>
       <Converter />
       <PickerList />
     </box>

@@ -1,35 +1,32 @@
-import { App } from "astal/gtk4";
+import app from "ags/gtk4/app";
 import Icon from "@lib/icons";
 
 import DashboardPopover from "../popovers/dashboard";
 import MediaPopover from "../popovers/media";
+import { pointer } from "@lib/utils";
 
 // Toggle mpris media widget menu
-export const Media = (
-  <menubutton setup={(self) => self.set_cursor_from_name("pointer")}>
-    <image cssClasses={["media-launch"]} iconName={Icon.mimetypes.audio} />
-    {MediaPopover}
+export const Media = () => (
+  <menubutton $={pointer}>
+    <image class="media-launch" iconName={Icon.mimetypes.audio} />
+    <MediaPopover />
   </menubutton>
 );
 
 // Toggle the dashboard
-export const Dashboard = (
+export const Dashboard = () => (
   <menubutton>
-    <button
-      setup={(self) => self.set_cursor_from_name("pointer")}
-      cssClasses={["dashboard-launch"]}
-      iconName={Icon.overview}
-    />
-    {DashboardPopover}
+    <button $={pointer} class="dashboard-launch" iconName={Icon.overview} />
+    <DashboardPopover />
   </menubutton>
 );
 
 // Toggle buttons for logging out, shutting down, etc.
-export const Session = (
+export const Session = () => (
   <button
-    setup={(self) => self.set_cursor_from_name("pointer")}
-    cssClasses={["session-launch"]}
+    $={pointer}
+    class="session-launch"
     iconName={Icon.powermenu.indicator}
-    onClicked={() => App.toggle_window("session")}
+    onClicked={() => app.toggle_window("session")}
   />
 );

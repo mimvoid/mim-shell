@@ -1,4 +1,4 @@
-import Gdk from "gi://Gdk";
+import { Gdk } from "ags/gtk4";
 
 const tempColor = new Gdk.RGBA();
 

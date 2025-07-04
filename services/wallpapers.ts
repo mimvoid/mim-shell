@@ -1,6 +1,8 @@
-import { exec, execAsync, monitorFile } from "astal";
-import { App } from "astal/gtk4";
-import GObject, { register } from "astal/gobject";
+import app from "ags/gtk4/app";
+import GObject, { register, property } from "ags/gobject";
+import { monitorFile } from "ags/file";
+import { exec, execAsync } from "ags/process";
+
 import GLib from "gi://GLib";
 import Gio from "gi://Gio";
 
@@ -18,6 +20,7 @@ export default class Wallpapers extends GObject.Object {
     return this.instance;
   }
 
+  @property(Array<Array<String>>)
   readonly wallpapers = this.fileInfo();
 
   constructor() {
@@ -27,7 +30,7 @@ export default class Wallpapers extends GObject.Object {
       if (e !== Gio.FileMonitorEvent.CHANGED) return;
 
       exec("sass ./style/style.scss /tmp/ags/style.css");
-      App.apply_css("/tmp/ags/style.css", true);
+      app.apply_css("/tmp/ags/style.css", true);
     });
   }
 

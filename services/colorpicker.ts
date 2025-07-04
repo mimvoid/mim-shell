@@ -1,5 +1,7 @@
-import { execAsync, readFile, subprocess, writeFileAsync } from "astal";
-import GObject, { register, property } from "astal/gobject";
+import GObject, { register, getter, setter } from "ags/gobject";
+import { readFile, writeFileAsync } from "ags/file";
+import { execAsync, subprocess } from "ags/process";
+
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib";
 
@@ -30,11 +32,12 @@ export default class Colorpicker extends GObject.Object {
     }
   }
 
-  @property()
+  @getter(Array<string>)
   get colors() {
     return this.#colors;
   }
 
+  @setter(Array<string>)
   set colors(colors) {
     this.#colors = colors;
     this.notify("colors");

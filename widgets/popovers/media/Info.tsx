@@ -1,58 +1,59 @@
-import { bind, Variable } from "astal";
-import { Gtk, hook } from "astal/gtk4";
-
+import { createBinding, createState } from "ags";
+import { Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 
 import Gio from "gi://Gio";
 import Pango from "gi://Pango";
 
 import Visualizer from "./Visualizer";
-import { Picture } from "@lib/astalified";
 import Icon from "@lib/icons";
+import { pointer } from "@lib/utils";
 
 // Information about the current song
 export default (player: Mpris.Player) => {
   const { START, END, FILL } = Gtk.Align;
-  const CavaWidget: Variable<Gtk.Widget | null> = Variable(null);
+  const [CavaWidget, setCavaWidget] = createState<Gtk.Widget | null>(null);
 
-  const VisToggle = (overlay: Gtk.Overlay) => (
-    <button
-      setup={(self) => self.set_cursor_from_name("pointer")}
-      onClicked={() => {
-        const CurrentCava = CavaWidget.get();
+  const VisToggle = (overlay: Gtk.Overlay) =>
+    (
+      <button
+        $={pointer}
+        $type="overlay"
+        onClicked={() => {
+          const CurrentCava = CavaWidget.get();
+          if (CurrentCava) {
+            CurrentCava.visible = !CurrentCava.visible;
+            return;
+          }
 
-        if (CurrentCava) {
-          CurrentCava.visible = !CurrentCava.visible;
-        } else {
           // Lazy load Cava visualizer
           const newCava = Visualizer();
-          CavaWidget.set(newCava);
+          setCavaWidget(newCava);
           overlay.add_overlay(newCava);
-        }
-      }}
-      iconName={Icon.visualizer}
-      cssClasses={["cava-toggler"]}
-      halign={END}
-      valign={START}
-    />
-  );
+        }}
+        class="cava-toggler"
+        iconName={Icon.visualizer}
+        halign={END}
+        valign={START}
+      />
+    ) as Gtk.Widget;
 
   // Display cover art
-  const CoverArtBox = <box cssClasses={["cover-art-box"]} />;
   const Art = (
-    <Picture
-      setup={(self) => {
-        function artHook(pic: Gtk.Picture) {
-          pic.visible = Boolean(player.coverArt);
-          if (pic.visible) {
-            pic.file = Gio.File.new_for_path(player.coverArt);
-          }
+    <Gtk.Picture
+      $={(self) => {
+        const coverArt = createBinding(player, "coverArt");
+
+        function getArt() {
+          const art = coverArt.get();
+          self.visible = !!art;
+          if (art) self.file = Gio.File.new_for_path(art);
         }
-        artHook(self);
-        hook(self, player, "notify::cover-art", artHook);
+        getArt();
+        coverArt.subscribe(getArt);
       }}
-      type="overlay clip"
-      cssClasses={["cover-art"]}
+      $type="overlay clip"
+      class="cover-art"
       contentFit={Gtk.ContentFit.COVER}
       valign={FILL}
     />
@@ -60,19 +61,18 @@ export default (player: Mpris.Player) => {
 
   const CoverArt = (
     <overlay
-      setup={(self) => self.add_overlay(VisToggle(self))}
-      cssClasses={["cover-art-container"]}
-      onDestroy={() => CavaWidget.drop()}
+      $={(self) => self.add_overlay(VisToggle(self))}
+      class="cover-art-container"
     >
-      {CoverArtBox}
+      <box class="cover-art-box" />
       {Art}
     </overlay>
   );
 
   const Title = (
     <label
-      cssClasses={["title"]}
-      label={bind(player, "title")}
+      class="title"
+      label={createBinding(player, "title")}
       justify={Gtk.Justification.CENTER}
       maxWidthChars={36}
       lines={2}
@@ -83,15 +83,15 @@ export default (player: Mpris.Player) => {
 
   const Artist = (
     <label
-      cssClasses={["media-artist"]}
-      label={bind(player, "artist")}
+      class="media-artist"
+      label={createBinding(player, "artist")}
       justify={Gtk.Justification.CENTER}
       wrap
     />
   );
 
   return (
-    <box cssClasses={["with-cover-art"]} vertical>
+    <box class="with-cover-art" orientation={Gtk.Orientation.VERTICAL}>
       {CoverArt}
       {Title}
       {Artist}

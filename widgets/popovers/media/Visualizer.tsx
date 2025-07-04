@@ -1,4 +1,4 @@
-import { Gtk, hook, Astal } from "astal/gtk4";
+import { Gtk, Astal } from "ags/gtk4";
 import Cava from "gi://AstalCava";
 
 export default () => {
@@ -6,7 +6,6 @@ export default () => {
 
   const cava = Cava.get_default()!;
   cava.bars = 12;
-  cava.active = true;
 
   const Bars = cava
     .get_values()
@@ -23,24 +22,25 @@ export default () => {
         ) as Astal.Slider,
     );
 
+  const len = Bars.length;
+  const id = cava.connect("notify::values", (cavaSrc) => {
+    const values = cavaSrc.get_values();
+    for (let i = 0; i < len; i++) {
+      Bars[i].value = values[i];
+    }
+  });
+
   return (
     <box
-      setup={(self) => {
-        hook(self, cava, "notify::values", () => {
-          const values = cava.get_values();
-          for (let i = 0; i < Bars.length; i++) {
-            Bars[i].value = values[i];
-          }
-        });
-        hook(self, self, "map", () => (cava.active = true));
-        hook(self, self, "unmap", () => (cava.active = false));
-      }}
-      cssClasses={["cava"]}
+      class="cava"
       spacing={2}
       valign={END}
       halign={FILL}
+      onMap={() => (cava.active = true)}
+      onUnmap={() => (cava.active = false)}
+      onDestroy={() => cava.disconnect(id)}
     >
       {Bars}
     </box>
-  );
+  ) as Gtk.Widget;
 };

@@ -9,8 +9,8 @@ export default {
   },
 
   bluetooth: {
-    enabled: "bluetooth-active-symbolic",
-    disabled: "bluetooth-disabled-symbolic",
+    on: "bluetooth-active-symbolic",
+    off: "bluetooth-disabled-symbolic",
     paired: "emblem-favorite-symbolic",
   },
 

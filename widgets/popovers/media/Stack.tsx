@@ -1,36 +1,37 @@
-import { bind } from "astal";
-import { Gtk } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 
-import { ScrolledWindow } from "@lib/astalified";
 import Actions from "./Actions";
 import Progress from "./Progress";
 import Info from "./Info";
 
 export default (player: Mpris.Player) => {
+  const { VERTICAL } = Gtk.Orientation;
+
   const Main = (
-    <box vertical>
+    <box orientation={VERTICAL}>
       {Actions(player)}
       {Progress(player)}
       {Info(player)}
     </box>
-  );
+  ) as Gtk.Widget;
 
   const Lyrics = (
-    <ScrolledWindow cssClasses={["lyrics"]}>
+    <scrolledwindow class="lyrics">
       <label
-        label={bind(player, "lyrics").as((l) => (l || "No lyrics"))}
+        label={createBinding(player, "lyrics").as((l) => (l || "No lyrics"))}
         justify={Gtk.Justification.LEFT}
         vexpand
         hexpand
         wrap
       />
-    </ScrolledWindow>
-  );
+    </scrolledwindow>
+  ) as Gtk.Widget;
 
   const MediaStack = (
     <stack
-      setup={(self) => {
+      $={(self) => {
         self.add_titled(Main, "main", "");
         self.add_titled(Lyrics, "lyrics", "");
       }}
@@ -40,15 +41,10 @@ export default (player: Mpris.Player) => {
     />
   ) as Gtk.Stack;
 
-  const Switcher = new Gtk.StackSwitcher({
-    stack: MediaStack,
-    cssClasses: ["no-labels"],
-  });
-
   return (
-    <box vertical>
+    <box orientation={VERTICAL}>
       {MediaStack}
-      {Switcher}
+      <Gtk.StackSwitcher stack={MediaStack} class="no-labels" />
     </box>
   );
 };

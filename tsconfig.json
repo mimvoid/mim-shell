@@ -1,20 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "baseUrl": "./",
-    "experimentalDecorators": true,
     "strict": true,
-    "target": "ES2023",
     "module": "ES2023",
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "astal/gtk4",
+    "jsxImportSource": "ags/gtk4",
     "paths": {
-      "astal": ["/home/zinnia/.local/share/ags"],
-      "astal/*": ["/home/zinnia/.local/share/ags/*"],
       "@lib/*": ["./lib/*"],
       "@services/*": ["./services/*"],
-      "@widgets/*": ["./widgets/*"]
-    },
+    }
   }
 }

@@ -1,10 +1,9 @@
-import { bind } from "astal";
-import { Gtk } from "astal/gtk4";
+import { pointer } from "@lib/utils";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 
 // Song progress
-
-const { START, END } = Gtk.Align;
 
 function lengthStr(length: number) {
   const min = Math.floor(length / 60);
@@ -13,40 +12,36 @@ function lengthStr(length: number) {
 }
 
 export default (player: Mpris.Player) => {
-  const position = bind(player, "position").as((p) =>
-    player.length > 0 ? p / player.length : 0,
-  );
+  const { START, END } = Gtk.Align;
+
+  const length = createBinding(player, "length");
+  const position = createBinding(player, "position");
 
   const ProgressBar = (
     <slider
-      setup={(self) => self.set_cursor_from_name("pointer")}
-      value={position}
-      onChangeValue={({ value }) => (player.position = value * player.length)}
+      $={pointer}
+      value={position((p) => (p > 0 ? p / player.length : 0))}
+      onChangeValue={({ value }) =>
+        void (player.position = value * player.length)
+      }
       hexpand
     />
   );
 
   const Position = (
-    <label
-      cssClasses={["position"]}
-      label={bind(player, "position").as(lengthStr)}
-      halign={START}
-    />
+    <label class="position" label={position(lengthStr)} halign={START} />
   );
 
   const Length = (
     <label
-      cssClasses={["length"]}
-      label={bind(player, "length").as((l) => (l > 0 ? lengthStr(l) : "0:00"))}
+      class="length"
+      label={length((l) => (l > 0 ? lengthStr(l) : "0:00"))}
       halign={END}
     />
   );
 
   return (
-    <box
-      cssClasses={["media-progress"]}
-      visible={bind(player, "length").as((l) => l > 0)}
-    >
+    <box class="media-progress" visible={length((l) => l > 0)}>
       {Position}
       {ProgressBar}
       {Length}

@@ -1,36 +1,35 @@
-import { Gtk, hook } from "astal/gtk4";
 import Notifd from "gi://AstalNotifd";
 
 import Icons from "@lib/icons";
 import { pointer, popButton } from "@lib/utils";
+import { createBinding } from "ags";
 
 const notifd = Notifd.get_default();
 
-const NotifDnd = (
-  <button
-    setup={(self) => {
-      pointer(self);
-      popButton(self);
+function NotifDnd() {
+  const dnd = createBinding(notifd, "dontDisturb");
+  const state = dnd((d) => (d ? "off" : "on"));
 
-      function dndHook(button: Gtk.Button) {
-        const dnd = notifd.dontDisturb;
-        const str = dnd ? "off" : "on";
+  return (
+    <button
+      $={(self) => {
+        pointer(self);
+        popButton(self);
 
-        dnd ? button.remove_css_class("off") : button.add_css_class("off");
-        button.tooltipText = `Turn ${str} Do not Disturb`;
-        button.iconName = Icons.notifications[str];
-      }
-
-      dndHook(self);
-      hook(self, notifd, "notify::dont-disturb", dndHook);
-    }}
-    cssClasses={["dnd-toggle", "big-toggle"]}
-    onClicked={() => (notifd.dontDisturb = !notifd.dontDisturb)}
-  />
-);
+        dnd.subscribe(() =>
+          dnd.get() ? self.remove_css_class("off") : self.add_css_class("off"),
+        );
+      }}
+      class="dnd-toggle big-toggle"
+      tooltipText={state((s) => `Turn ${s} Do not Disturb`)}
+      iconName={state((s) => Icons.notifications[s])}
+      onClicked={() => (notifd.dontDisturb = !notifd.dontDisturb)}
+    />
+  );
+}
 
 export default () => (
-  <box cssClasses={["toggles", "section"]} spacing={10}>
-    {NotifDnd}
+  <box class="toggles section" spacing={10}>
+    <NotifDnd />
   </box>
 );

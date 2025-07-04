@@ -34,12 +34,14 @@
 }
 
 .workspaces {
-  padding: 0.65rem 0; // Make workspace buttons slimmer
+  padding: 0.65rem 0; // Keep buttons slim
 
   button {
     @include looks.transition;
 
     min-width: 0.4em;
+    min-height: 0.8em;
+
     color: transparent;
     background-color: palette.$primary;
 
@@ -56,8 +58,7 @@
 }
 
 .window-title {
-  // Extra spacing
-  margin-left: 0.25em;
+  margin-left: 0.25em; // Extra spacing
 }
 
 .clock {

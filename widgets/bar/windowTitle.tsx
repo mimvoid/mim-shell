@@ -1,25 +1,29 @@
-import { Gtk, hook } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Hyprland from "gi://AstalHyprland";
 import Pango from "gi://Pango";
 
 export default () => {
   const hypr = Hyprland.get_default();
+  const focusedClient = createBinding(hypr, "focusedClient");
 
-  function hookClient(lab: Gtk.Label) {
-    lab.visible = !!hypr.focusedClient;
-    if (!lab.visible) return;
+  function updateClient(self: Gtk.Label) {
+    const client = focusedClient.get();
+    self.visible = !!client;
+    if (!self.visible) return;
 
-    lab.label = hypr.focusedClient.title;
-    lab.tooltipText = hypr.focusedClient.title;
+    const title = client.title;
+    self.label = title;
+    self.tooltipText = title;
   }
 
   return (
     <label
-      setup={(self) => {
-        hookClient(self);
-        hook(self, hypr, "notify::focused-client", hookClient);
+      $={(self) => {
+        updateClient(self);
+        focusedClient.subscribe(() => updateClient(self));
       }}
-      cssClasses={["window-title"]}
+      class="window-title"
       ellipsize={Pango.EllipsizeMode.END}
       maxWidthChars={42}
     />

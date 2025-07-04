@@ -1,5 +1,5 @@
-import { bind } from "astal";
-import { Gtk, hook } from "astal/gtk4";
+import { createBinding } from "ags";
+import { Gtk } from "ags/gtk4";
 import Network from "gi://AstalNetwork";
 import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
@@ -8,37 +8,45 @@ const network = Network.get_default();
 const wifi = network.wifi;
 
 const { START, CENTER } = Gtk.Align;
+const { VERTICAL } = Gtk.Orientation;
 
-const Current = (
-  <box cssClasses={["section", "current"]}>
-    <button
-      setup={(self) => {
-        pointer(self);
-        popButton(self);
+function Current() {
+  const enabled = createBinding(wifi, "enabled");
+  const icon = createBinding(wifi, "iconName");
+  const ssid = createBinding(wifi, "ssid");
+  const strength = createBinding(wifi, "strength").as((s) => `${s}%`);
 
-        function enabledHook(button: Gtk.Button) {
-          const e = wifi.enabled;
-          button.tooltipText = `Turn ${wifi.enabled ? "off" : "on"} wifi`;
-          e ? button.remove_css_class("off") : button.add_css_class("off");
-        }
+  return (
+    <box cssClasses={["section", "current"]}>
+      <button
+        $={(self) => {
+          pointer(self);
+          popButton(self);
 
-        enabledHook(self);
-        hook(self, wifi, "notify::enabled", enabledHook);
-      }}
-      cssClasses={["big-toggle"]}
-      onClicked={() => (wifi.enabled = !wifi.enabled)}
-    >
-      <image iconName={bind(wifi, "iconName")} iconSize={Gtk.IconSize.LARGE} />
-    </button>
-    <box valign={CENTER} vertical>
-      <label label={bind(wifi, "ssid")} halign={START} />
-      <label label={bind(wifi, "strength").as((i) => `${i}%`)} halign={START} />
+          enabled.subscribe(() =>
+            enabled.get()
+              ? self.remove_css_class("off")
+              : self.add_css_class("off"),
+          );
+        }}
+        class="big-toggle"
+        tooltipText={enabled((e) => `Turn ${e ? "off" : "on"} wifi`)}
+        onClicked={() => (wifi.enabled = !wifi.enabled)}
+      >
+        <image iconName={icon} iconSize={Gtk.IconSize.LARGE} />
+      </button>
+      <box valign={CENTER} orientation={VERTICAL}>
+        <label label={ssid} halign={START} />
+        <label label={strength} halign={START} />
+      </box>
     </box>
-  </box>
-);
+  );
+}
 
-export default (
-  <PopRevealer cssClasses={["network-popover"]} hasArrow={false}>
-    <box vertical>{Current}</box>
+export default () => (
+  <PopRevealer class="network-popover" hasArrow={false}>
+    <box orientation={VERTICAL}>
+      <Current />
+    </box>
   </PopRevealer>
 ) as Gtk.Popover;

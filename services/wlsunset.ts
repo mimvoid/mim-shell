@@ -1,5 +1,5 @@
-import GObject, { register, property } from "astal/gobject";
-import { exec, execAsync } from "astal";
+import GObject, { register, getter, setter } from "ags/gobject";
+import { exec, execAsync } from "ags/process";
 
 @register({ GTypeName: "wlsunset" })
 export default class WlSunset extends GObject.Object {
@@ -21,11 +21,12 @@ export default class WlSunset extends GObject.Object {
     }
   }
 
-  @property(Boolean)
+  @getter(Boolean)
   get running() {
     return this.#running;
   }
 
+  @setter(Boolean)
   set running(stat: boolean) {
     execAsync(`systemctl --user ${stat ? "start" : "stop"} wlsunset.service`)
       .then(() => {

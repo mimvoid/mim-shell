@@ -1,15 +1,21 @@
-import { bind } from "astal";
+import { With, createBinding } from "ags";
 import Mpris from "gi://AstalMpris";
 
 import MediaStack from "./Stack";
 import Placeholder from "./Placeholder";
 import PopRevealer from "@lib/widgets/PopRevealer";
 
-const mpris = Mpris.get_default();
-
 // Pass the mpris player to the widget modules
-export default (
-  <PopRevealer name="media" cssClasses={["media", "box"]} hasArrow={false}>
-    {bind(mpris, "players").as((ps) => (ps[0] ? MediaStack(ps[0]) : Placeholder()))}
-  </PopRevealer>
-);
+export default () => {
+  const mpris = Mpris.get_default();
+  const Ph = Placeholder();
+  const players = createBinding(mpris, "players");
+
+  return (
+    <PopRevealer name="media" class="media box" hasArrow={false}>
+      <With value={players}>
+        {(ps: Mpris.Player[]) => (ps[0] ? MediaStack(ps[0]) : Ph)}
+      </With>
+    </PopRevealer>
+  );
+};
