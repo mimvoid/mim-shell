@@ -6,8 +6,8 @@ import Mpris from "gi://AstalMpris";
 // Song progress
 
 function lengthStr(length: number) {
-  const min = Math.floor(length / 60);
-  const sec = (length - min * 60).toString().padStart(2, "0");
+  const min = Math.trunc(length / 60);
+  const sec = (Math.trunc(length) - min * 60).toString().padStart(2, "0");
   return `${min}:${sec}`;
 }
 

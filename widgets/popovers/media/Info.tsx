@@ -39,11 +39,10 @@ export default (player: Mpris.Player) => {
     ) as Gtk.Widget;
 
   // Display cover art
+  const coverArt = createBinding(player, "coverArt");
   const Art = (
     <Gtk.Picture
       $={(self) => {
-        const coverArt = createBinding(player, "coverArt");
-
         function getArt() {
           const art = coverArt.get();
           self.visible = !!art;
@@ -52,7 +51,7 @@ export default (player: Mpris.Player) => {
         getArt();
         coverArt.subscribe(getArt);
       }}
-      $type="overlay clip"
+      $type="overlay"
       class="cover-art"
       contentFit={Gtk.ContentFit.COVER}
       valign={FILL}
