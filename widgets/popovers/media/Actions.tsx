@@ -58,27 +58,26 @@ export default (player: Mpris.Player) => {
     const { UNSUPPORTED, NONE, TRACK } = Mpris.Loop;
     const loop = createBinding(player, "loopStatus");
 
+    function updateLoop(self: Gtk.Button) {
+      const loopStatus = loop.get();
+      self.visible = loopStatus !== UNSUPPORTED;
+      if (!self.visible) return;
+
+      self.iconName = Icons.mpris[loopStatus === TRACK ? "loopSong" : "loop"];
+      loopStatus == NONE
+        ? self.add_css_class("off")
+        : self.remove_css_class("off");
+    }
+
     return (
       <button
         $={(self) => {
           setupButton(self);
-
-          loop.subscribe(() => {
-            if (!self.visible) return;
-
-            const loopStatus = loop.get();
-
-            self.iconName =
-              Icons.mpris[loopStatus === TRACK ? "loopSong" : "loop"];
-
-            loopStatus == NONE
-              ? self.add_css_class("off")
-              : self.remove_css_class("off");
-          });
+          updateLoop(self);
+          loop.subscribe(() => updateLoop(self));
         }}
-        $type="left"
+        $type="start"
         class="loop"
-        visible={loop((l) => l !== UNSUPPORTED)}
         halign={START}
         onClicked={() => player.loop()}
       />
@@ -89,26 +88,29 @@ export default (player: Mpris.Player) => {
     const { UNSUPPORTED, ON } = Mpris.Shuffle;
     const shuffle = createBinding(player, "shuffleStatus");
 
+    function updateShuffle(self: Gtk.Button) {
+      const shuffleStatus = shuffle.get();
+      self.visible = shuffleStatus !== UNSUPPORTED;
+      if (!self.visible) return;
+
+      if (shuffleStatus === ON) {
+        self.remove_css_class("off");
+        self.iconName = Icons.mpris.shuffle;
+      } else {
+        self.add_css_class("off");
+        self.iconName = Icons.mpris.noShuffle;
+      }
+    }
+
     return (
       <button
         $={(self) => {
           setupButton(self);
-
-          shuffle.subscribe(() => {
-            if (!self.visible) return;
-
-            if (shuffle.get() === ON) {
-              self.remove_css_class("off");
-              self.iconName = Icons.mpris.shuffle;
-            } else {
-              self.add_css_class("off");
-              self.iconName = Icons.mpris.noShuffle;
-            }
-          });
+          updateShuffle(self);
+          shuffle.subscribe(() => updateShuffle(self));
         }}
-        $type="right"
+        $type="end"
         class="shuffle"
-        visible={shuffle((s) => s !== UNSUPPORTED)}
         halign={END}
         onClicked={() => player.shuffle()}
       />
