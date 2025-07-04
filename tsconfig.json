@@ -2,6 +2,8 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "strict": true,
+    "incremental": true,
+    "skipLibCheck": true,
     "module": "ES2023",
     "target": "ES2023",
     "lib": ["ES2023"],
