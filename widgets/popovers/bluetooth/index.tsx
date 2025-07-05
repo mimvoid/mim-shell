@@ -49,28 +49,21 @@ function Status() {
 
 export default () => {
   const [connectedDevices, disconnectedDevices] = Devices();
+  const hasConnected = connectedDevices((d) => !!d[0]);
 
-  function Connected() {
-    const hasConnected = connectedDevices((d) => !!d[0]);
-
-    const DefaultLabel = (
+  const Connected = (
+    <box class="section connected" orientation={VERTICAL}>
+      <label class="title" label="Connected" halign={START} />
+      <box orientation={VERTICAL} visible={hasConnected}>
+        <For each={connectedDevices}>{(d) => d}</For>
+      </box>
       <label
         label="None connected"
         halign={START}
         visible={hasConnected((c) => !c)}
       />
-    );
-
-    return (
-      <box class="section connected" orientation={Gtk.Orientation.VERTICAL}>
-        <label class="title" label="Connected" halign={START} />
-        <box orientation={VERTICAL} visible={hasConnected}>
-          <For each={connectedDevices}>{(d) => d}</For>
-        </box>
-        {DefaultLabel}
-      </box>
-    );
-  }
+    </box>
+  );
 
   const Disconnected = (
     <box class="section disconnected" orientation={VERTICAL}>
@@ -85,7 +78,7 @@ export default () => {
     <PopRevealer class="bluetooth-popover" hasArrow={false}>
       <box orientation={VERTICAL}>
         <Status />
-        <Connected />
+        {Connected}
         {Disconnected}
       </box>
     </PopRevealer>

@@ -7,7 +7,7 @@ import { exec } from "ags/process";
 
 function Session() {
   const { START, END } = Gtk.Align;
-  const actions: string[][] = [
+  const actions = [
     ["lock", "hyprlock"],
     ["logout", "hyprctl dispatch exit"],
     ["reboot", "systemctl reboot"],

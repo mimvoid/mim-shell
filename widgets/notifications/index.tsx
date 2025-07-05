@@ -36,16 +36,13 @@ export default () => {
       for (let i = 0, len = notifs.length; i < len; i++) {
         if (notifs[i].id === id) {
           notifs[i] = notification;
-          setNotifications(notifs);
+          setNotifications([...notifs]);
           return;
         }
       }
     }
 
-    setNotifications((ns) => {
-      ns.unshift(notification);
-      return ns;
-    });
+    setNotifications((ns) => [notification, ...ns]);
   });
 
   const resolvedId = notifd.connect("resolved", (_, id) => {

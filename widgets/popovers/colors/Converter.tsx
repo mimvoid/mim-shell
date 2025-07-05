@@ -21,8 +21,8 @@ export default () => {
   );
 
   function updateColor(value: string) {
-    const rgba = new Gdk.RGBA();
-    if (rgba.parse(value)) setColor(rgba);
+    const rgba = color.get();
+    if (rgba.parse(value)) setColor(rgba.copy());
   }
   const lastColor = picker.colors.at(-1);
   if (lastColor) updateColor(lastColor);

@@ -1,9 +1,8 @@
 import { Gdk } from "ags/gtk4";
 
-const tempColor = new Gdk.RGBA();
-
 export function newGdkRgba(value: string) {
-  return tempColor.parse(value) ? tempColor.copy() : null;
+  const gRgba = new Gdk.RGBA();
+  return gRgba.parse(value) ? gRgba : null;
 }
 
 export function hexToRgb(value: string) {

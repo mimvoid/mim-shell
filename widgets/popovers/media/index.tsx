@@ -13,9 +13,7 @@ export default () => {
 
   return (
     <PopRevealer name="media" class="media box" hasArrow={false}>
-      <With value={players}>
-        {(ps: Mpris.Player[]) => (ps[0] ? MediaStack(ps[0]) : Ph)}
-      </With>
+      <With value={players}>{(ps) => (ps[0] ? MediaStack(ps[0]) : Ph)}</With>
     </PopRevealer>
   );
 };

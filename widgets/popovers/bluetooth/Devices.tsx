@@ -10,18 +10,12 @@ export default () => {
 
   function addWidget(button: Gtk.Button, isConnected: boolean) {
     const addTo = isConnected ? setConnDevices : setDisDevices;
-    addTo((prev) => {
-      prev.push(button);
-      return prev;
-    });
+    addTo((prev) => [...prev, button]);
   }
 
   function removeWidget(button: Gtk.Button, isConnected: boolean) {
     const removeFrom = isConnected ? setDisDevices : setConnDevices;
-    removeFrom((prev) => {
-      prev.splice(prev.indexOf(button));
-      return prev;
-    });
+    removeFrom((prev) => prev.filter((btn) => btn !== button));
   }
 
   const bluetooth = Bluetooth.get_default();
