@@ -16,6 +16,21 @@
     border: 1px solid palette.$error;
   }
 
+  .app-icon {
+    @include fonts.font-size(1.6);
+
+    margin: 0.5rem;
+    margin-right: 1rem;
+    color: palette.$secondary;
+  }
+
+  .image {
+    @include looks.radius;
+
+    background-size: cover;
+    background-position: center;
+  }
+
   .header {
     margin: 0.5rem 0;
     color: palette.$string-dim;
@@ -45,7 +60,7 @@
     margin: 0.5em 0.25em 0;
 
     button {
-      padding: 0.5em;
+      padding: 0.75em;
     }
 
     &:first-child {
@@ -54,24 +69,5 @@
     &:last-child {
       margin-right: 0;
     }
-  }
-}
-
-.notif-icon {
-  .app-icon,
-  .image,
-  .icon-image {
-    @include fonts.font-size(1.6);
-
-    margin: 0.5rem;
-    margin-right: 1rem;
-    color: palette.$secondary;
-  }
-
-  .image {
-    @include looks.radius;
-
-    background-size: cover;
-    background-position: center;
   }
 }

@@ -86,17 +86,21 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
         <label
           label={n.summary}
           class="summary"
-          halign={START}
-          xalign={0}
           wrap
+          widthChars={36}
+          maxWidthChars={36}
+          xalign={0}
+          halign={START}
         />
         {n.body && (
           <label
             label={n.body}
             class="body"
             wrap
+            widthChars={36}
             maxWidthChars={36}
             useMarkup
+            xalign={0}
             halign={START}
           />
         )}

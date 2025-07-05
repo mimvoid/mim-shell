@@ -20,7 +20,7 @@ function NotifDnd() {
           dnd.get() ? self.remove_css_class("off") : self.add_css_class("off"),
         );
       }}
-      class="dnd-toggle big-toggle"
+      class={dnd.get() ? "dnd-toggle big-toggle" : "dnd-toggle big-toggle off"}
       tooltipText={state((s) => `Turn ${s} Do not Disturb`)}
       iconName={state((s) => Icons.notifications[s])}
       onClicked={() => (notifd.dontDisturb = !notifd.dontDisturb)}
