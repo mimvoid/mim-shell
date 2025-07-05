@@ -37,7 +37,7 @@ export default class PopRevealer extends Gtk.Popover {
     type?: string | null,
   ) {
     if (child instanceof Gtk.Widget) {
-      if (!this.#revealer.get_child()) this.#revealer.set_child(child);
+      this.#revealer.set_child(child);
     } else {
       super.vfunc_add_child(builder, child, type);
     }
