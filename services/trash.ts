@@ -9,11 +9,12 @@ export default class Trash extends GObject.Object {
   static readonly trashDirectory = GLib.get_user_data_dir() + "/Trash/files";
   protected static trashFile = Gio.File.new_for_path(Trash.trashDirectory);
 
-  #monitor: Gio.FileMonitor | null = null;
+  // Keep a reference to the directory file monitor
+  #moveMonitor: Gio.FileMonitor | null = null;
 
   #diskUsage = 0;
   #fileCount = 0;
-  #iconName = "user-trash-symbolic";
+  #iconName: string;
 
   static get_default() {
     if (!this.instance) this.instance = new Trash();
@@ -27,52 +28,61 @@ export default class Trash extends GObject.Object {
       const [diskUsage, _, fileCount] = this.measureTrash();
       this.#diskUsage = diskUsage;
       this.#fileCount = fileCount;
+
+      this.#moveMonitor = Trash.trashFile.monitor_directory(
+        Gio.FileMonitorFlags.WATCH_MOVES,
+        null,
+      );
     } catch (err) {
       console.error(err);
     }
 
-    try {
-      this.#monitor = Trash.trashFile.monitor_directory(
-        Gio.FileMonitorFlags.WATCH_MOVES,
-        null,
-      );
-      this.#monitor.connect("changed", (_, file, otherFile, event) => {
-        try {
-          switch (event) {
-            case Gio.FileMonitorEvent.MOVED_OUT:
-              this.fileCount--;
-              if (otherFile) {
-                this.diskUsage -= otherFile.measure_disk_usage(
-                  Gio.FileMeasureFlags.APPARENT_SIZE,
-                  null,
-                  null,
-                )[1];
-              } else {
-                // The file was probably deleted, which means we can't
-                // measure its size
-                this.diskUsage = this.measureTrash()[0];
-              }
-              break;
-            case Gio.FileMonitorEvent.MOVED_IN:
-              this.fileCount++;
-              this.diskUsage += file.measure_disk_usage(
+    this.#iconName =
+      this.#fileCount === 0
+        ? "user-trash-symbolic"
+        : "user-trash-full-symbolic";
+
+    this.#moveMonitor?.connect("changed", (_, file, otherFile, event) => {
+      switch (event) {
+        case Gio.FileMonitorEvent.MOVED_OUT:
+          if (--this.fileCount === 0) {
+            this.iconName = "user-trash-symbolic";
+          }
+          try {
+            if (otherFile) {
+              this.diskUsage -= otherFile.measure_disk_usage(
                 Gio.FileMeasureFlags.APPARENT_SIZE,
                 null,
                 null,
               )[1];
-              break;
-            default:
-              break;
+            } else {
+              // The file was likely deleted, so we can't measure its size
+              this.diskUsage = this.measureTrash()[0];
+            }
+          } catch (err) {
+            console.error(err);
           }
-        } catch (err) {
-          console.error(err);
-        }
-      });
-    } catch (err) {
-      console.error(err);
-    }
+          break;
+        case Gio.FileMonitorEvent.MOVED_IN:
+          if (this.fileCount++ === 0) {
+            this.iconName = "user-trash-full-symbolic";
+          }
+          try {
+            this.diskUsage += file.measure_disk_usage(
+              Gio.FileMeasureFlags.APPARENT_SIZE,
+              null,
+              null,
+            )[1];
+          } catch (err) {
+            console.error(err);
+          }
+        default:
+          break;
+      }
+    });
   }
 
+  // The size of the trash directory in bytes
   @getter(Number)
   get diskUsage() {
     return this.#diskUsage;
@@ -84,6 +94,7 @@ export default class Trash extends GObject.Object {
     this.notify("disk-usage");
   }
 
+  // The number of files in the trash
   @getter(Number)
   get fileCount() {
     return this.#fileCount;
@@ -95,6 +106,7 @@ export default class Trash extends GObject.Object {
     this.notify("file-count");
   }
 
+  // An icon based on the number of files in trash
   @getter(String)
   get iconName() {
     return this.#iconName;
@@ -103,9 +115,15 @@ export default class Trash extends GObject.Object {
   @setter(String)
   protected set iconName(icon: string) {
     this.#iconName = icon;
-    this.notify("icon");
+    this.notify("icon-name");
   }
 
+  /**
+   * Measures the disk usage of the trash directory.
+   * May throw an error.
+   *
+   * @returns The disk usage, number of directories, and number of files
+   */
   protected measureTrash() {
     const [_, ...data] = Trash.trashFile.measure_disk_usage(
       Gio.FileMeasureFlags.APPARENT_SIZE,
