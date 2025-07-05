@@ -6,8 +6,10 @@ interface DropdownProps extends Gtk.Revealer.ConstructorProps {
   label: GObject.Object | string;
 }
 
-@register({ GTypeName: "Dropdown" })
+@register({ GTypeName: "Dropdown", Implements: [Gtk.Buildable] })
 export default class Dropdown extends Astal.Box {
+  #revealer: Gtk.Revealer;
+
   constructor({
     child,
     label,
@@ -16,14 +18,9 @@ export default class Dropdown extends Astal.Box {
     transitionType = Gtk.RevealerTransitionType.SLIDE_DOWN,
     ...props
   }: Partial<DropdownProps>) {
-    super({
-      cssClasses: revealChild
-        ? ["dropdown", "section", "open"]
-        : ["dropdown", "section"],
-      vertical: true,
-    });
+    super({ vertical: true });
 
-    const Revealer = (
+    this.#revealer = (
       <revealer
         revealChild={revealChild}
         transitionDuration={transitionDuration}
@@ -43,7 +40,9 @@ export default class Dropdown extends Astal.Box {
       (
         <button
           $={pointer}
-          onClicked={() => (Revealer.revealChild = !Revealer.revealChild)}
+          onClicked={() =>
+            (this.#revealer.revealChild = !this.#revealer.revealChild)
+          }
           hexpand
         >
           <box spacing={6}>
@@ -56,7 +55,27 @@ export default class Dropdown extends Astal.Box {
           </box>
         </button>
       ) as Gtk.Button,
-      Revealer,
+      this.#revealer,
     ]);
+
+    const realizeId = this.connect("realize", () => {
+      this.add_css_class("dropdown");
+      this.add_css_class("section");
+      if (revealChild) this.add_css_class("open");
+
+      this.disconnect(realizeId);
+    });
+  }
+
+  vfunc_add_child(
+    builder: Gtk.Builder,
+    child: GObject.Object,
+    type?: string | null,
+  ) {
+    if (child instanceof Gtk.Widget) {
+      this.#revealer.set_child(child);
+    } else {
+      super.vfunc_add_child(builder, child, type);
+    }
   }
 }
