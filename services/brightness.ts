@@ -1,6 +1,7 @@
 import GObject, { register, getter, setter } from "ags/gobject";
 import { monitorFile, readFileAsync } from "ags/file";
 import { exec, execAsync } from "ags/process";
+import { Percent } from "@lib/GObjectTypes";
 
 @register({ GTypeName: "Brightness" })
 export default class Brightness extends GObject.Object {
@@ -30,12 +31,12 @@ export default class Brightness extends GObject.Object {
     });
   }
 
-  @getter(Number)
+  @getter(Percent)
   get light() {
     return this.#light;
   }
 
-  @setter(Number)
+  @setter(Percent)
   set light(percent) {
     // Check for limits
     if (percent < 0) percent = 0;

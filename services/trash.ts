@@ -1,6 +1,7 @@
 import GObject, { register, getter, setter } from "ags/gobject";
 import GLib from "gi://GLib";
 import Gio from "gi://Gio";
+import { UInt } from "@lib/GObjectTypes";
 
 @register({ GTypeName: "Trash" })
 export default class Trash extends GObject.Object {
@@ -83,24 +84,24 @@ export default class Trash extends GObject.Object {
   }
 
   // The size of the trash directory in bytes
-  @getter(Number)
+  @getter(UInt)
   get diskUsage() {
     return this.#diskUsage;
   }
 
-  @setter(Number)
+  @setter(UInt)
   protected set diskUsage(size: number) {
     this.#diskUsage = size;
     this.notify("disk-usage");
   }
 
   // The number of files in the trash
-  @getter(Number)
+  @getter(UInt)
   get fileCount() {
     return this.#fileCount;
   }
 
-  @setter(Number)
+  @setter(UInt)
   protected set fileCount(count: number) {
     this.#fileCount = count;
     this.notify("file-count");

@@ -1,5 +1,6 @@
-import GObject, { register } from "ags/gobject";
+import GObject, { register, getter, setter } from "ags/gobject";
 import { Astal, Gtk } from "ags/gtk4";
+import { UInt, RevealerTransitionType } from "@lib/GObjectTypes";
 
 interface HoverRevealerProps extends Gtk.Revealer.ConstructorProps {
   hiddenChild: GObject.Object;
@@ -16,7 +17,7 @@ export default class HoverRevealer extends Astal.Box {
     transitionType = Gtk.RevealerTransitionType.SLIDE_RIGHT,
     ...props
   }: Partial<HoverRevealerProps>) {
-    super({ cssClasses: ["hover-revealer"] });
+    super();
     this.set_cursor_from_name("pointer");
 
     this.#revealer = (
@@ -37,10 +38,41 @@ export default class HoverRevealer extends Astal.Box {
     this.add_controller(hover);
     hover.connect("enter", () => (this.#revealer.reveal_child = true));
     hover.connect("leave", () => (this.#revealer.reveal_child = false));
+
+    const realizeId = this.connect("realize", () => {
+      this.add_css_class("hover-revealer");
+      this.disconnect(realizeId);
+    })
   }
 
-  set_hidden_child(child: Gtk.Widget | null) {
-    this.#revealer.set_child(child);
+  @getter(Gtk.Widget)
+  get hiddenChild() {
+    return this.#revealer.child;
+  }
+  @setter(Gtk.Widget)
+  set hiddenChild(hiddenChild) {
+    this.#revealer.child = hiddenChild;
+    this.notify("hidden-child");
+  }
+
+  @getter(UInt)
+  get transitionDuration() {
+    return this.#revealer.transitionDuration;
+  }
+  @setter(UInt)
+  set transitionDuration(duration) {
+    this.#revealer.transitionDuration = duration;
+    this.notify("transition-duration");
+  }
+
+  @getter(RevealerTransitionType)
+  get transitionType() {
+    return this.#revealer.transitionType;
+  }
+  @setter(RevealerTransitionType)
+  set transitionType(transitionType) {
+    this.#revealer.transitionType = transitionType;
+    this.notify("transition-type");
   }
 
   vfunc_add_child(
@@ -50,7 +82,7 @@ export default class HoverRevealer extends Astal.Box {
   ) {
     if (child instanceof Gtk.Widget) {
       if (type && type === "hidden" && !this.#revealer.get_child()) {
-        this.set_hidden_child(child);
+        this.hiddenChild = child;
       } else {
         this.append(child);
       }

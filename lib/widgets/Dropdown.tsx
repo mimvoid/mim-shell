@@ -1,6 +1,7 @@
 import { Astal, Gtk } from "ags/gtk4";
-import GObject, { register } from "ags/gobject";
+import GObject, { register, getter, setter } from "ags/gobject";
 import { pointer } from "@lib/utils";
+import { UInt, RevealerTransitionType } from "@lib/GObjectTypes";
 
 interface DropdownProps extends Gtk.Revealer.ConstructorProps {
   label: GObject.Object | string;
@@ -65,6 +66,26 @@ export default class Dropdown extends Astal.Box {
 
       this.disconnect(realizeId);
     });
+  }
+
+  @getter(UInt)
+  get transitionDuration() {
+    return this.#revealer.transitionDuration;
+  }
+  @setter(UInt)
+  set transitionDuration(duration) {
+    this.#revealer.transitionDuration = duration;
+    this.notify("transition-duration");
+  }
+
+  @getter(RevealerTransitionType)
+  get transitionType() {
+    return this.#revealer.transitionType;
+  }
+  @setter(RevealerTransitionType)
+  set transitionType(transitionType) {
+    this.#revealer.transitionType = transitionType;
+    this.notify("transition-type");
   }
 
   vfunc_add_child(
