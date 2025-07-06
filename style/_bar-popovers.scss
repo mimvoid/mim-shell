@@ -77,6 +77,18 @@
       @include looks.color-toggle(palette.$tertiary-dim);
     }
   }
+
+  .access-points {
+    > button {
+      padding: 0.5em;
+      image {
+        color: palette.$tertiary-dim;
+      }
+    }
+    .lock {
+      margin-left: 1em;
+    }
+  }
 }
 
 .colors-popover {

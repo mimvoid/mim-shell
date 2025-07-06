@@ -30,6 +30,7 @@ export default {
   memory: "memory-symbolic",
 
   hider: "pan-start-symbolic",
+  lock: "system-lock-screen-symbolic",
 
   mimetypes: {
     image: "image-x-generic-symbolic",
@@ -70,6 +71,7 @@ export default {
     shutdown: "system-shutdown-symbolic",
   },
 
+  refresh: "view-refresh-symbolic",
   visualizer: "format-justify-right-symbolic",
   waiting: "content-loading-symbolic",
 
