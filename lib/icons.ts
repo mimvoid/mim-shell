@@ -11,7 +11,7 @@ export default {
   bluetooth: {
     on: "bluetooth-active-symbolic",
     off: "bluetooth-disabled-symbolic",
-    paired: "emblem-favorite-symbolic",
+    paired: "emote-love-symbolic",
   },
 
   brightness: {

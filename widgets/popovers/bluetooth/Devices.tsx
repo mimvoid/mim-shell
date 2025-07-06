@@ -1,71 +1,86 @@
-import { Accessor, createBinding, createState } from "ags";
+import { createBinding, onCleanup } from "ags";
 import { Gtk } from "ags/gtk4";
 import Bluetooth from "gi://AstalBluetooth";
 import Icon from "@lib/icons";
 import { pointer } from "@lib/utils";
 
+function toggleConnect(device: Bluetooth.Device, icon: Gtk.Image) {
+  return () => {
+    if (device.connecting) return;
+    icon.iconName = Icon.waiting;
+    const callback = () => (icon.iconName = device.icon);
+
+    device.connected
+      ? device.disconnect_device(callback)
+      : device.connect_device(callback);
+  };
+}
+
+function DeviceWidget(device: Bluetooth.Device) {
+  const ExtraInfo = (
+    <box class="device-info" halign={Gtk.Align.END}>
+      {device.paired && (
+        <image iconName={Icon.bluetooth.paired} tooltipText="Paired" />
+      )}
+    </box>
+  );
+  const DeviceIcon = new Gtk.Image({ iconName: device.icon });
+
+  return (
+    <button
+      $={pointer}
+      class="device"
+      tooltipText={createBinding(device, "connected").as(
+        (c) => (c ? "Disconnect" : "Connect") + " device",
+      )}
+      onClicked={toggleConnect(device, DeviceIcon)}
+    >
+      <box widthRequest={180}>
+        {DeviceIcon}
+        <label label={device.alias} halign={Gtk.Align.START} hexpand />
+        {ExtraInfo}
+      </box>
+    </button>
+  ) as Gtk.Widget;
+}
+
 export default () => {
-  const [connDevices, setConnDevices] = createState(Array<Gtk.Widget>());
-  const [disDevices, setDisDevices] = createState(Array<Gtk.Widget>());
-
-  function addWidget(button: Gtk.Button, isConnected: boolean) {
-    const addTo = isConnected ? setConnDevices : setDisDevices;
-    addTo((prev) => [...prev, button]);
-  }
-
-  function removeWidget(button: Gtk.Button, isConnected: boolean) {
-    const removeFrom = isConnected ? setDisDevices : setConnDevices;
-    removeFrom((prev) => prev.filter((btn) => btn !== button));
-  }
+  const { VERTICAL } = Gtk.Orientation;
 
   const bluetooth = Bluetooth.get_default();
-  bluetooth.get_devices().map((device) => {
-    const connected = createBinding(device, "connected");
+  const isConnected = createBinding(bluetooth, "isConnected");
 
-    const DeviceInfo = (
-      <box class="device-info" halign={Gtk.Align.END}>
-        {device.paired && (
-          <image iconName={Icon.bluetooth.paired} tooltipText="Paired" />
-        )}
-      </box>
-    );
+  const ConnectedBox = (
+    <box orientation={VERTICAL} visible={isConnected} />
+  ) as Gtk.Box;
+  const DisconnectedBox = new Gtk.Box({ orientation: VERTICAL });
 
-    const DeviceIcon = new Gtk.Image({ iconName: device.icon });
+  function addWidget(device: Bluetooth.Device) {
+    const widget = DeviceWidget(device);
+    const parent = device.connected ? ConnectedBox : DisconnectedBox;
+    parent.append(widget);
 
-    return (
-      <button
-        $={(self) => {
-          pointer(self);
-          addWidget(self, device.connected);
+    const connectId = device.connect("notify::connected", (_device) => {
+      widget.unparent();
+      const newParent = _device.connected ? ConnectedBox : DisconnectedBox;
+      newParent.append(widget);
+    });
+    ConnectedBox.connect("destroy", () => device?.disconnect(connectId));
+    DisconnectedBox.connect("destroy", () => device?.disconnect(connectId));
 
-          connected.subscribe(() => {
-            addWidget(self, connected.get());
-            removeWidget(self, connected.get());
-          });
-        }}
-        class="device"
-        tooltipText={connected(
-          (c) => (c ? "Disconnect" : "Connect") + " device",
-        )}
-        onClicked={() => {
-          if (device.connecting) return;
+    const removeId = bluetooth.connect("device-removed", (_, _device) => {
+      if (_device !== device) return;
+      if (widget.get_parent()) widget.unparent();
+      widget.run_dispose();
+    });
+    widget.connect("destroy", () => bluetooth.disconnect(removeId));
+  }
 
-          DeviceIcon.iconName = Icon.waiting;
-          const callback = () => (DeviceIcon.iconName = device.icon);
+  bluetooth.devices.forEach(addWidget);
+  const addId = bluetooth.connect("device-added", (_, device) =>
+    addWidget(device),
+  );
+  onCleanup(() => bluetooth.disconnect(addId));
 
-          device.connected
-            ? device.disconnect_device(callback)
-            : device.connect_device(callback);
-        }}
-      >
-        <box widthRequest={180}>
-          {DeviceIcon}
-          <label label={device.alias} halign={Gtk.Align.START} hexpand />
-          {DeviceInfo}
-        </box>
-      </button>
-    );
-  });
-
-  return [connDevices, disDevices];
+  return { ConnectedBox, DisconnectedBox, isConnected };
 };

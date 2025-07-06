@@ -1,4 +1,4 @@
-import { createBinding, For } from "ags";
+import { createBinding } from "ags";
 import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 import Bluetooth from "gi://AstalBluetooth";
@@ -8,11 +8,11 @@ import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
 import Devices from "./Devices";
 
-const bluetooth = Bluetooth.get_default();
 const { START, CENTER } = Gtk.Align;
 const { VERTICAL } = Gtk.Orientation;
 
 function Status() {
+  const bluetooth = Bluetooth.get_default();
   const onClicked = () => execAsync("rfkill toggle bluetooth");
   const powered = createBinding(bluetooth, "isPowered");
 
@@ -22,8 +22,13 @@ function Status() {
         $={(self) => {
           pointer(self);
           popButton(self);
+          powered.subscribe(() =>
+            powered.get()
+              ? self.remove_css_class("off")
+              : self.add_css_class("off"),
+          );
         }}
-        class={powered((p) => (p ? "big-toggle" : "big-toggle off"))}
+        class={bluetooth.isPowered ? "big-toggle" : "big-toggle off"}
         tooltipText={powered((p) =>
           p ? "Turn off Bluetooth" : "Turn on Bluetooth",
         )}
@@ -46,19 +51,16 @@ function Status() {
 }
 
 export default () => {
-  const [connectedDevices, disconnectedDevices] = Devices();
-  const hasConnected = connectedDevices((d) => !!d[0]);
+  const { ConnectedBox, DisconnectedBox, isConnected } = Devices();
 
   const Connected = (
     <box class="section connected" orientation={VERTICAL}>
       <label class="title" label="Connected" halign={START} />
-      <box orientation={VERTICAL} visible={hasConnected}>
-        <For each={connectedDevices}>{(d) => d}</For>
-      </box>
+      {ConnectedBox}
       <label
         label="None connected"
         halign={START}
-        visible={hasConnected((c) => !c)}
+        visible={isConnected((c) => !c)}
       />
     </box>
   );
@@ -66,9 +68,7 @@ export default () => {
   const Disconnected = (
     <box class="section disconnected" orientation={VERTICAL}>
       <label class="title" label="Disconnected" halign={START} />
-      <box orientation={VERTICAL}>
-        <For each={disconnectedDevices}>{(d) => d}</For>
-      </box>
+      {DisconnectedBox}
     </box>
   );
 
