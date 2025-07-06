@@ -13,9 +13,7 @@ const { START, CENTER } = Gtk.Align;
 const { VERTICAL } = Gtk.Orientation;
 
 function Status() {
-  const onClicked = () =>
-    execAsync("bluetooth " + (bluetooth.isPowered ? "off" : "on"));
-
+  const onClicked = () => execAsync("rfkill toggle bluetooth");
   const powered = createBinding(bluetooth, "isPowered");
 
   return (

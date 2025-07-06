@@ -20,9 +20,7 @@ function Indicator() {
       $={pointer}
       tooltipText={state((s) => "Bluetooth " + s)}
       iconName={state((s) => Icon.bluetooth[s])}
-      onClicked={() =>
-        execAsync("bluetooth " + (bluetooth.isPowered ? "off" : "on"))
-      }
+      onClicked={() => execAsync("rfkill toggle bluetooth")}
     />
   );
 }

@@ -3,6 +3,7 @@ import { Gtk } from "ags/gtk4";
 import Network from "gi://AstalNetwork";
 import PopRevealer from "@lib/widgets/PopRevealer";
 import { pointer, popButton } from "@lib/utils";
+import { execAsync } from "ags/process";
 
 const network = Network.get_default();
 const wifi = network.wifi;
@@ -31,7 +32,7 @@ function Current() {
         }}
         class="big-toggle"
         tooltipText={enabled((e) => `Turn ${e ? "off" : "on"} wifi`)}
-        onClicked={() => (wifi.enabled = !wifi.enabled)}
+        onClicked={() => execAsync("rfkill toggle wifi")}
       >
         <image iconName={icon} iconSize={Gtk.IconSize.LARGE} />
       </button>
