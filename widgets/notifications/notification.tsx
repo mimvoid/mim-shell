@@ -42,12 +42,35 @@ type Props = {
 };
 
 export default ({ notification: n, onHoverLeave, setup }: Props) => {
-  const Icon = (
-    <image
-      class="app-icon"
-      iconName={n.appIcon || n.desktopEntry || "dialog-information-symbolic"}
-    />
-  );
+  function makeImage() {
+    if (!n.image) return;
+    if (isIcon(n.image)) {
+      return (
+        <image
+          class="icon-image"
+          iconName={n.image}
+          hexpand
+          vexpand
+          halign={CENTER}
+          valign={CENTER}
+        />
+      );
+    } else if (fileExists(n.image)) {
+      return <image class="image" valign={START} file={n.image} />;
+    }
+  }
+
+  function Icon() {
+    if (n.appIcon) {
+      return <image class="app-icon" iconName={n.appIcon} />;
+    }
+
+    return (
+      makeImage() || (
+        <image class="app-icon" iconName="dialog-information-symbolic" />
+      )
+    );
+  }
 
   const Header = (
     <box class="header">
@@ -61,58 +84,38 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
     </box>
   );
 
-  function Content() {
-    function mkImage(image: string) {
-      if (fileExists(image)) {
-        return <image class="image" valign={START} file={n.image} />;
-      }
-      if (isIcon(image)) {
-        return (
-          <image
-            class="icon-image"
-            iconName={n.image}
-            hexpand
-            vexpand
-            halign={CENTER}
-            valign={CENTER}
-          />
-        );
-      }
-    }
-
-    return (
-      <box class="content" orientation={VERTICAL}>
-        {n.image && mkImage(n.image)}
+  const Content = (
+    <box class="content" orientation={VERTICAL}>
+      {n.appIcon && makeImage()}
+      <label
+        label={n.summary}
+        class="summary"
+        wrap
+        widthChars={36}
+        maxWidthChars={36}
+        xalign={0}
+        halign={START}
+      />
+      {n.body && (
         <label
-          label={n.summary}
-          class="summary"
+          label={n.body}
+          class="body"
           wrap
           widthChars={36}
           maxWidthChars={36}
+          useMarkup
           xalign={0}
           halign={START}
         />
-        {n.body && (
-          <label
-            label={n.body}
-            class="body"
-            wrap
-            widthChars={36}
-            maxWidthChars={36}
-            useMarkup
-            xalign={0}
-            halign={START}
-          />
-        )}
-      </box>
-    );
-  }
+      )}
+    </box>
+  );
 
   // Put contents together
   const Main = (
     <box orientation={VERTICAL}>
       {Header}
-      <Content />
+      {Content}
       {
         // Create a button for each action if they exist
         !!n.get_actions()[0] && (
@@ -131,7 +134,7 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
   // Put everything together
   const NotifBox = (
     <box class="notification">
-      {Icon}
+      <Icon />
       {Main}
     </box>
   );

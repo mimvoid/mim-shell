@@ -16,7 +16,9 @@
     border: 1px solid palette.$error;
   }
 
-  .app-icon {
+  .app-icon,
+  > .icon-image,
+  > .image {
     @include fonts.font-size(1.6);
 
     margin: 0.5rem;
