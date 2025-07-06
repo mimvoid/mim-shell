@@ -4,6 +4,7 @@ import { execAsync, subprocess } from "ags/process";
 
 import Gio from "gi://Gio?version=2.0";
 import GLib from "gi://GLib";
+import { sendNotification } from "@lib/notifications";
 
 const MAX_COLORS = 10;
 
@@ -66,9 +67,11 @@ export default class Colorpicker extends GObject.Object {
 
   async copy(color: string) {
     execAsync(["wl-copy", color]).catch(console.error);
-    execAsync(
-      `notify-send "Colorpicker" "Copied to clipboard:\n\n${color}"`,
-    ).catch(console.error);
+    sendNotification({
+      title: "Colorpicker",
+      body: "Copied to clipboard:\n\n" + color,
+      icon: "color-select-symbolic",
+    });
   }
 
   add(color: string) {
