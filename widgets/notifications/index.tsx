@@ -89,7 +89,7 @@ export default () => {
           visible={notifications((ns) => !!ns[0])}
           name={WINDOW_NAME}
           namespace={WINDOW_NAME}
-          class="notification-popups"
+          class="notification-popups transparent"
           gdkmonitor={monitor}
           exclusivity={Astal.Exclusivity.EXCLUSIVE}
           anchor={TOP | RIGHT}

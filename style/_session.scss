@@ -1,7 +1,3 @@
-@use "sass:color";
-@use "palette";
-@use "abstracts/looks";
-
 @mixin grid-box($v, $h) {
   $v-opposed: "bottom";
   @if $v == "bottom" {
@@ -13,7 +9,7 @@
     $h-opposed: "left";
   }
 
-  border-#{$v}-#{$h}-radius: looks.$radius;
+  border-#{$v}-#{$h}-radius: var(--radius);
   margin-#{$v}: 0.75em;
   margin-#{$h}: 0.75em;
 
@@ -24,7 +20,7 @@
 }
 
 #session {
-  color: palette.$primary-bright;
+  color: var(--primary-bright);
 
   image {
     margin: 5rem 7.5rem;
@@ -36,12 +32,12 @@
 
   .box {
     border-radius: 2px;
-    filter: drop-shadow(palette.$shadow, 2px, 2px, 16px);
+    filter: drop-shadow(var(--shadow), 2px, 2px, 16px);
 
     &:focus {
-      @include looks.radius;
-      color: palette.$primary;
-      background-color: color.change(palette.$base, $alpha: 0.7);
+      border-radius: var(--radius);
+      color: var(--primary);
+      background-color: rgb(from var(--base) r g b / 0.7);
 
       image {
         -gtk-icon-size: 4.75rem;
@@ -49,11 +45,11 @@
     }
 
     &:hover {
-      @include looks.radius;
+      border-radius: var(--radius);
 
       margin: 4px;
-      color: palette.$base;
-      background-color: palette.$primary;
+      color: var(--base);
+      background-color: var(--primary);
 
       image {
         -gtk-icon-size: 5rem;

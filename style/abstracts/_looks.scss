@@ -1,17 +1,31 @@
 @use "../palette";
 
-$radius: 8px;
-$transition: all 0.2s ease-in-out;
+:root {
+  --radius: 8px;
+  --transition-duration: 0.2s;
+  --transition-timing: ease-in-out;
+  --transition: all var(--transition-duration) var(--transition-timing);
 
-$icons: "Adwaita";
-$fallback-icons: "Papirus";
-
-@mixin radius($scale: 1) {
-  border-radius: $radius * $scale;
+  --icon-theme: "Adwaita";
+  --fallback-icon-theme: "Papirus";
 }
 
-@mixin transition() {
-  transition: $transition;
+@mixin radius($scale: 1) {
+  @if $scale == 1 {
+    border-radius: var(--radius);
+  } @else {
+    border-radius: calc(var(--radius) * $scale);
+  }
+}
+
+@mixin transition(
+  $property: all,
+  $duration: var(--transition-duration),
+  $timing: var(--transition-timing)
+) {
+  transition-property: $property;
+  transition-duration: $duration;
+  transition-timing-function: $timing;
 }
 
 // Simulates an outline around text
@@ -29,10 +43,15 @@ $fallback-icons: "Papirus";
 
 @mixin color-toggle($color) {
   background-color: $color;
-  color: palette.$base;
+  color: var(--base);
+
+  &:hover {
+    background-color: hsl(from $color h s calc(l + 10%) / alpha);
+    color: var(--base);
+  }
 
   &.off {
-    background-color: palette.$box;
+    background-color: var(--box);
     color: $color;
   }
 }

@@ -1,5 +1,3 @@
-@use "palette";
-@use "abstracts/looks";
 @use "abstracts/fonts";
 
 .wallpaper-picker {
@@ -7,7 +5,7 @@
 
   scrolledwindow {
     padding: 1rem;
-    background-color: palette.$base;
+    background-color: var(--base);
   }
 
   button {

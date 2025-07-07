@@ -79,7 +79,7 @@ export default () => {
           }
           name="bar"
           namespace="bar"
-          class="bar"
+          class="bar transparent"
           gdkmonitor={monitor}
           exclusivity={Astal.Exclusivity.EXCLUSIVE}
           anchor={TOP | LEFT | RIGHT}

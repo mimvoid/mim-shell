@@ -1,44 +1,39 @@
-@use "sass:color";
-@use "palette";
 @use "abstracts/fonts";
 
 window {
   @include fonts.font;
-  color: palette.$string;
 }
-
 .display {
   @include fonts.display;
 }
 
 placeholder,
 text.read-only {
-  color: palette.$string-dim;
+  color: var(--string-dim, gray);
 }
 
 label.title {
-  @include fonts.title-size;
   margin-bottom: 0.75rem;
+  font-size: var(--title-size);
   font-weight: bolder;
-  color: palette.$primary-bright;
+  color: var(--primary-bright);
 }
 
 entry {
   padding: 0.5rem;
-  background-color: palette.$box-dim;
+  background-color: var(--box-dim);
 
   &.warn {
-    color: palette.$warn;
+    color: var(--warn);
   }
-
   &.error {
-    color: palette.$error;
+    color: var(--error);
   }
 }
 
 tooltip {
   margin: 2px;
   padding: 1em;
-  color: palette.$string;
-  background-color: color.change(palette.$base, $alpha: 0.7);
+  color: var(--string);
+  background-color: rgb(from var(--base) r g b / 0.7);
 }

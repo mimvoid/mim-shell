@@ -1,5 +1,3 @@
-@use "sass:color";
-@use "palette";
 @use "abstracts/fonts";
 @use "abstracts/looks";
 
@@ -9,11 +7,11 @@
   margin: 0.5em 1.5em;
   padding: 0.75rem;
 
-  border: 1px solid palette.$primary;
-  background-color: palette.$base;
+  border: 1px solid var(--accent);
+  background-color: var(--base);
 
   &.critical {
-    border: 1px solid palette.$error;
+    --accent: var(--error);
   }
 
   .app-icon,
@@ -23,7 +21,7 @@
 
     margin: 0.5rem;
     margin-right: 1rem;
-    color: palette.$secondary;
+    color: var(--secondary);
   }
 
   .image {
@@ -35,7 +33,7 @@
 
   .header {
     margin: 0.5rem 0;
-    color: palette.$string-dim;
+    color: var(--string-dim);
   }
   .app-name {
     margin-right: 1em;
@@ -49,16 +47,16 @@
 
   .summary {
     font-weight: bold;
-    color: palette.$secondary;
+    color: var(--secondary);
   }
 
   .body {
     padding-bottom: 0.5rem;
-    color: palette.$string;
+    color: var(--string);
   }
 
   .actions {
-    color: palette.$primary-dim;
+    color: var(--primary-dim);
     margin: 0.5em 0.25em 0;
 
     button {

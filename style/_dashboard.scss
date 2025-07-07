@@ -1,4 +1,3 @@
-@use "./palette";
 @use "abstracts/fonts";
 @use "abstracts/looks";
 
@@ -15,8 +14,8 @@
 
 .dashboard {
   .toggles {
+    --accent: var(--primary);
     button {
-      @include looks.color-toggle(palette.$primary);
       padding: 1.5em;
     }
 
@@ -26,10 +25,10 @@
   }
 
   .launchers image {
-    color: palette.$primary;
+    color: var(--primary);
   }
 
   .trash-info image {
-    color: palette.$secondary;
+    color: var(--secondary);
   }
 }

@@ -57,7 +57,7 @@ export default () => (
     }
     name="session"
     namespace="session"
-    class="session"
+    class="session transparent"
     visible={false}
     anchor={Astal.WindowAnchor.NONE}
     layer={Astal.Layer.OVERLAY}

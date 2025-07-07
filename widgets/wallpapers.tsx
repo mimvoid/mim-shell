@@ -49,7 +49,7 @@ export default () => {
       }}
       name="wallpaperPicker"
       namespace="wallpaper-picker"
-      class="wallpaper-picker popover"
+      class="wallpaper-picker popover transparent"
       visible
       anchor={BOTTOM | LEFT | RIGHT}
       layer={Astal.Layer.OVERLAY}

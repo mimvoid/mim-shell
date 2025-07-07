@@ -1,5 +1,3 @@
-@use "sass:color";
-@use "palette";
 @use "abstracts/looks";
 @use "abstracts/fonts";
 @use "abstracts/space";
@@ -20,21 +18,20 @@ trough,
 highlight,
 block.filled,
 .box {
-  @include looks.radius;
+  border-radius: var(--radius);
 }
 
-window.dialog {
-  $bg: color.change(palette.$base, $alpha: 1);
+window {
+  --accent: var(--primary);
 
-  @include fonts.menu-size;
+  &.background {
+    background-color: rgb(from var(--base) r g b / 1);
 
-  color: palette.$string;
-  background-color: $bg;
-
-  > box,
-  headerbar {
-    padding: 1rem;
-    background-color: $bg;
+    > box,
+    headerbar {
+      padding: 1rem;
+      background-color: rgb(from var(--base) r g b / 1);
+    }
   }
 }
 
@@ -43,16 +40,16 @@ popover {
 
   margin: 0.25rem 0.5rem;
   padding: 1em;
-  background-color: color.change(palette.$base, $alpha: 0.9);
-  color: palette.$string;
+  background-color: rgb(from var(--base) r g b / 0.9);
+  color: var(--string);
 
   label {
-    @include fonts.menu-size;
+    font-size: inherit;
   }
 }
 
 .box {
-  background-color: palette.$base;
+  background-color: var(--base);
 }
 .section {
   margin: 1rem;
@@ -64,7 +61,7 @@ popover {
     margin-bottom: 1rem;
 
     image {
-      @include looks.transition;
+      @include looks.transition(-gtk-icon-transform);
       @include fonts.font-size(1.25);
     }
     .title {
@@ -91,11 +88,11 @@ button {
   background-color: transparent;
 
   &:focus-within {
-    background-color: color.change(palette.$box-dim, $alpha: 0.05);
+    background-color: rgb(from var(--box-dim) r g b / 0.05);
   }
 
   &:hover {
-    background-color: palette.$box;
+    background-color: var(--box);
 
     image {
       -gtk-icon-transform: scale(1.05);
@@ -109,14 +106,8 @@ button {
 
 .big-toggle {
   @include looks.transition;
+  @include looks.color-toggle(var(--accent));
   padding: 0.75rem;
-  color: palette.$base;
-  background-color: palette.$primary;
-
-  &.off {
-    background-color: palette.$box;
-    color: palette.$string;
-  }
 }
 
 stack {
@@ -129,12 +120,12 @@ stack {
 
 stackswitcher {
   button {
-    background-color: palette.$box-dim;
+    background-color: var(--box-dim);
 
     &:checked,
     &:focus,
     &:hover {
-      background-color: palette.$primary-dim;
+      background-color: var(--primary-dim);
     }
   }
 
@@ -187,10 +178,12 @@ menubutton {
 trough {
   min-width: 8em;
   min-height: 0.6em;
+  background-color: var(--box-bright);
 
-  background-color: palette.$box-bright;
+  highlight {
+    background-color: var(--accent);
+  }
 }
-
 value.right {
   margin-left: 0.25em;
 }
@@ -203,21 +196,23 @@ scrollbar {
   slider {
     min-height: 1px;
     min-width: 1px;
-    background-color: palette.$box;
+    background-color: var(--box);
 
     &:hover {
-      background-color: palette.$box-bright;
+      background-color: var(--box-bright);
     }
   }
 
   &.vertical {
-    trough, slider {
+    trough,
+    slider {
       min-width: 4px;
     }
   }
 
   &.horizontal {
-    trough, slider {
+    trough,
+    slider {
       min-height: 4px;
     }
   }

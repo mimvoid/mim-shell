@@ -1,44 +1,25 @@
-@use "palette";
 @use "abstracts/looks";
 @use "abstracts/fonts";
 
+popover .big-toggle {
+  margin-right: 0.75rem;
+}
+
 .audio-popover {
   .speaker {
-    $c: palette.$tertiary-bright;
-
-    trough highlight {
-      background-color: $c;
-    }
-    button {
-      @include looks.color-toggle($c);
-    }
+    --accent: var(--tertiary-bright);
   }
-
   .microphone {
-    $c: palette.$tertiary;
-
-    trough highlight {
-      background-color: $c;
-    }
-    button {
-      @include looks.color-toggle($c);
-    }
-  }
-
-  button {
-    margin-right: 0.75rem;
+    --accent: var(--tertiary);
   }
 }
 
 .bluetooth-popover {
+  --accent: var(--tertiary);
+
   .status {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-
-    button {
-      margin-right: 0.75rem;
-      @include looks.color-toggle(palette.$tertiary);
-    }
   }
 
   .device {
@@ -46,17 +27,17 @@
 
     image {
       -gtk-icon-style: symbolic;
-      color: palette.$tertiary;
+      color: var(--accent);
     }
 
     .device-info {
       @include looks.transition;
       margin-left: 0.75rem;
-      color: palette.$string-dim;
+      color: var(--string-dim);
       opacity: 0;
 
       image {
-        color: palette.$string-dim;
+        color: var(--string-dim);
       }
     }
 
@@ -67,23 +48,14 @@
 }
 
 .network-popover {
-  .current {
-    image {
-      @include looks.transition;
-    }
-
-    button {
-      margin-right: 0.75rem;
-      @include looks.color-toggle(palette.$tertiary-dim);
-    }
-  }
+  --accent: var(--tertiary-dim);
 
   .access-points {
     > button {
       padding: 0.5em;
-      image {
-        color: palette.$tertiary-dim;
-      }
+    }
+    image {
+      color: var(--accent);
     }
     .lock {
       margin-left: 1em;
@@ -107,7 +79,7 @@
     }
 
     colorswatch {
-      @include looks.radius;
+      border-radius: var(--radius);
     }
   }
 
@@ -134,7 +106,7 @@
       @include fonts.menu-size;
       min-width: 16em;
       margin: 0.5em 0;
-      color: palette.$string;
+      color: var(--string);
     }
   }
 }

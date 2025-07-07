@@ -1,25 +1,21 @@
-@use "sass:color";
-@use "palette";
 @use "abstracts/looks";
 @use "abstracts/space";
 
 .bar {
-  color: color.mix(palette.$primary, palette.$string, $weight: 25%);
+  color: color-mix(in oklab, var(--primary), var(--string) 75%);
 
   centerbox {
-    color: palette.$primary;
+    color: var(--primary);
     background-color: transparent;
   }
 
   .left {
     padding-right: 1em;
   }
-
   .center {
     padding-left: 0.5em;
     padding-right: 0.5em;
   }
-
   .right {
     padding-left: 0.5em;
   }
@@ -30,7 +26,7 @@
 /*---------*/
 
 .dashboard-launch image {
-  color: palette.$tertiary-dim;
+  color: var(--tertiary-dim);
 }
 
 .workspaces {
@@ -43,16 +39,16 @@
     min-height: 0.8em;
 
     color: transparent;
-    background-color: palette.$primary;
+    background-color: var(--primary);
 
     // Expand active workspace GNOME-style
     &.active {
       min-width: 1.75em;
-      background-color: palette.$primary-dim;
+      background-color: var(--primary-dim);
     }
 
     &:hover {
-      background-color: palette.$tertiary-dim;
+      background-color: var(--tertiary-dim);
     }
   }
 }
@@ -74,7 +70,7 @@
   @include looks.transition;
 
   opacity: 0.7;
-  color: palette.$tertiary-dim;
+  color: var(--tertiary-dim);
 
   &.open {
     -gtk-icon-transform: rotate(-90deg);
@@ -87,13 +83,13 @@
   margin: 0.85rem 0;
 
   border-radius: 64px;
-  background-color: palette.$tertiary-dim;
+  background-color: var(--tertiary-dim);
   opacity: 0.7;
 }
 
 .colorpicker {
   menubutton {
-    color: palette.$primary-dim;
+    color: var(--primary-dim);
   }
 
   .color-display {
@@ -103,31 +99,25 @@
     }
 
     colorswatch {
-      border: 1px solid palette.$box-bright;
+      border: 1px solid var(--box-bright);
       border-radius: 24px;
     }
   }
 }
 
 .network {
-  color: palette.$tertiary-dim;
+  color: var(--tertiary-dim);
 }
-
 .bluetooth {
-  color: palette.$tertiary;
+  color: var(--tertiary);
 }
-
 .sound {
-  $c: palette.$tertiary-bright;
-  color: $c;
-
-  trough highlight {
-    background-color: $c;
-  }
+  --accent: var(--tertiary-bright);
+  color: var(--accent);
 }
 
 .battery {
-  color: palette.$good;
+  color: var(--good);
 
   image {
     -gtk-icon-transform: rotate(90deg);
@@ -135,14 +125,10 @@
 }
 
 .brightness {
-  $c: color.adjust(palette.$error, $lightness: 8%);
+  --accent: hsl(from var(--error) h s calc(l * 1.08));
 
   margin: 0 0.25em; // extra space
-  color: $c;
-
-  highlight {
-    background-color: $c;
-  }
+  color: var(--accent);
 
   .hover-revealer {
     min-width: 0.5rem;
@@ -152,7 +138,7 @@
   @include looks.transition;
 
   &.off image {
-    color: palette.$tertiary;
+    color: var(--tertiary);
   }
 }
 
@@ -160,11 +146,11 @@
   @include looks.transition;
 
   padding: 0 0.75em;
-  color: palette.$primary;
-  background-color: palette.$box;
+  color: var(--primary);
+  background-color: var(--box);
 
   &:hover {
-    color: color.change(palette.$base, $alpha: 1);
-    background-color: color.change(palette.$primary, $alpha: 0.9);
+    color: rgb(from var(--base) r g b / 1);
+    background-color: rgb(from var(--primary) r g b / 0.9);
   }
 }

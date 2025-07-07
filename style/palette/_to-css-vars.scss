@@ -1,0 +1,29 @@
+// Incomplete snippet
+window {
+  --base: #{$base};
+
+  --box: #{$box};
+  --box-bright: #{$box-bright};
+  --box-dim: #{$box-dim};
+
+  --string: #{$string};
+  --string-dim: #{$string-dim};
+
+  --shadow: #{$shadow};
+
+  --primary: #{$primary};
+  --primary-bright: #{$primary-bright};
+  --primary-dim: #{$primary-dim};
+
+  --secondary: #{$secondary};
+  --secondary-bright: #{$secondary-bright};
+  --secondary-dim: #{$secondary-dim};
+
+  --tertiary: #{$tertiary};
+  --tertiary-bright: #{$tertiary-bright};
+  --tertiary-dim: #{$tertiary-dim};
+
+  --good: #{$good};
+  --warn: #{$warn};
+  --error: #{$error};
+}
