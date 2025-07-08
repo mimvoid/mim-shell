@@ -11,16 +11,13 @@ function NotifDnd() {
   const state = dnd((d) => (d ? "off" : "on"));
 
   return (
-    <button
+    <togglebutton
       $={(self) => {
         pointer(self);
         popButton(self);
-
-        dnd.subscribe(() =>
-          dnd.get() ? self.remove_css_class("off") : self.add_css_class("off"),
-        );
       }}
-      class={dnd.get() ? "dnd-toggle big-toggle" : "dnd-toggle big-toggle off"}
+      class="dnd-toggle big-toggle"
+      active={dnd}
       tooltipText={state((s) => `Turn ${s} Do not Disturb`)}
       iconName={state((s) => Icons.notifications[s])}
       onClicked={() => (notifd.dontDisturb = !notifd.dontDisturb)}

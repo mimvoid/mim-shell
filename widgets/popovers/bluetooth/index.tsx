@@ -18,17 +18,13 @@ function Status() {
 
   return (
     <box class="status section">
-      <button
+      <togglebutton
         $={(self) => {
           pointer(self);
           popButton(self);
-          powered.subscribe(() =>
-            powered.get()
-              ? self.remove_css_class("off")
-              : self.add_css_class("off"),
-          );
         }}
-        class={bluetooth.isPowered ? "big-toggle" : "big-toggle off"}
+        class="big-toggle"
+        active={powered}
         tooltipText={powered((p) =>
           p ? "Turn off Bluetooth" : "Turn on Bluetooth",
         )}
@@ -38,7 +34,7 @@ function Status() {
           iconName={powered((p) => Icon.bluetooth[p ? "on" : "off"])}
           iconSize={Gtk.IconSize.LARGE}
         />
-      </button>
+      </togglebutton>
       <box valign={CENTER} orientation={VERTICAL}>
         <label
           label={createBinding(bluetooth, "adapter").as((a) => a.name)}

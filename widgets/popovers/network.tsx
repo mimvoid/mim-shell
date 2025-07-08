@@ -1,4 +1,4 @@
-import { createBinding, createState, For } from "ags";
+import { createBinding, For } from "ags";
 import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 import Network from "gi://AstalNetwork";
@@ -46,21 +46,15 @@ export default () => {
 
     return (
       <box class="section current">
-        <button
-          $={(self) => {
-            setupButton(self);
-            enabled.subscribe(() =>
-              enabled.get()
-                ? self.remove_css_class("off")
-                : self.add_css_class("off"),
-            );
-          }}
+        <togglebutton
+          $={setupButton}
           class="big-toggle"
+          active={enabled}
           tooltipText={enabled((e) => `Turn ${e ? "off" : "on"} wifi`)}
           onClicked={() => execAsync("rfkill toggle wifi")}
         >
           <image iconName={icon} iconSize={Gtk.IconSize.LARGE} />
-        </button>
+        </togglebutton>
         <box valign={CENTER} orientation={VERTICAL}>
           <label label={createBinding(wifi, "ssid")} halign={START} />
           <label label={strength} halign={START} />

@@ -42,16 +42,20 @@
 }
 
 @mixin color-toggle($color) {
-  background-color: $color;
-  color: var(--base);
+  background-color: var(--box);
+  color: $color;
 
   &:hover {
-    background-color: hsl(from $color h s calc(l + 10%) / alpha);
-    color: var(--base);
+    background-color: var(--box-bright);
   }
 
-  &.off {
-    background-color: var(--box);
-    color: $color;
+  &:checked {
+    background-color: $color;
+    color: var(--base);
+
+    &:hover {
+      background-color: hsl(from $color h s calc(l + 10%) / alpha);
+      color: var(--base);
+    }
   }
 }

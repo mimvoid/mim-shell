@@ -18,16 +18,13 @@ function Section(endpoint: Wp.Endpoint, name: string) {
 
   const Icon = (
     // Can mute or unmute
-    <button
+    <togglebutton
       $={(self) => {
         pointer(self);
         popButton(self);
-
-        mute.subscribe(() =>
-          mute.get() ? self.add_css_class("off") : self.remove_css_class("off"),
-        );
       }}
       class="big-toggle"
+      active={mute((m) => !m)}
       tooltipText={mute((m) => (m ? "Unmute " : "Mute ") + lowerName)}
       onClicked={() => (endpoint.mute = !endpoint.mute)}
     >
@@ -35,7 +32,7 @@ function Section(endpoint: Wp.Endpoint, name: string) {
         iconName={createBinding(endpoint, "volumeIcon")}
         iconSize={Gtk.IconSize.LARGE}
       />
-    </button>
+    </togglebutton>
   );
 
   const Label = (
