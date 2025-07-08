@@ -1,7 +1,7 @@
-import { pointer } from "@lib/utils";
-import { createBinding } from "ags";
+import { createBinding, createComputed } from "ags";
 import { Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
+import { pointer } from "@lib/utils";
 
 // Song progress
 
@@ -14,13 +14,16 @@ function lengthStr(length: number) {
 export default (player: Mpris.Player) => {
   const { START, END } = Gtk.Align;
 
-  const length = createBinding(player, "length");
   const position = createBinding(player, "position");
+  const length = createBinding(player, "length");
+  const progress = createComputed([position, length], (pos, len) =>
+    len > 0 ? pos / len : 0,
+  );
 
   const ProgressBar = (
     <slider
       $={pointer}
-      value={position((p) => (p > 0 ? p / player.length : 0))}
+      value={progress}
       onChangeValue={({ value }) =>
         void (player.position = value * player.length)
       }
