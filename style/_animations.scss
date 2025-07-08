@@ -10,3 +10,12 @@
     transform: scale(var(--scale));
   }
 }
+
+@keyframes spin {
+  from {
+    -gtk-icon-transform: rotate(0deg);
+  }
+  to {
+    -gtk-icon-transform: rotate(360deg);
+  }
+}

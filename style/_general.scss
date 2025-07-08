@@ -217,3 +217,13 @@ scrollbar {
     }
   }
 }
+
+spinner {
+  opacity: 0;
+  -gtk-icon-source: -gtk-icontheme("process-working-symbolic");
+
+  &:checked {
+    opacity: 1;
+    animation: spin 1s linear infinite;
+  }
+}

@@ -1,5 +1,5 @@
 import app from "ags/gtk4/app";
-import GObject, { register, property } from "ags/gobject";
+import GObject, { register, getter } from "ags/gobject";
 import { monitorFile } from "ags/file";
 import { exec, execAsync } from "ags/process";
 
@@ -20,11 +20,13 @@ export default class Wallpapers extends GObject.Object {
     return this.instance;
   }
 
-  @property(Array<Array<String>>)
-  readonly wallpapers = this.fileInfo();
+  #wallpapers = Array<Array<string>>();
 
   constructor() {
     super();
+
+    Gio._promisify(Gio.File.prototype, "enumerate_children_async");
+    Gio._promisify(Gio.FileEnumerator.prototype, "next_files_async");
 
     monitorFile("./style/palette/_matugen.scss", (_, e) => {
       if (e !== Gio.FileMonitorEvent.CHANGED) return;
@@ -34,21 +36,27 @@ export default class Wallpapers extends GObject.Object {
     });
   }
 
+  @getter(Array<Array<string>>)
+  get wallpapers() {
+    return this.#wallpapers;
+  }
+
   async setWallpaper(path: string) {
     execAsync(
       "matugen image " + path + " -t scheme-rainbow --contrast 0.5 -q",
     ).catch(console.error);
   }
 
-  private wallpapersEnum() {
+  private async wallpapersEnum() {
     const wpGFile = Gio.File.new_for_path(Wallpapers.directory);
 
     try {
       // Get childen with a Gio.FileEnumerator object
       const attrs = displayName + "," + fastContentType + "," + thumbnailPath;
-      return wpGFile.enumerate_children(
+      return await wpGFile.enumerate_children_async(
         attrs,
         Gio.FileQueryInfoFlags.NONE,
+        GLib.PRIORITY_DEFAULT,
         null,
       );
     } catch (err) {
@@ -60,26 +68,24 @@ export default class Wallpapers extends GObject.Object {
     }
   }
 
-  private fileInfo() {
-    const enumerator = this.wallpapersEnum();
-    const info: string[][] = [];
+  async loadWallpapers() {
+    const info = Array<Array<string>>();
+    const enumerator = await this.wallpapersEnum();
 
     if (enumerator) {
-      let file = enumerator.next_file(null);
-      while (file !== null) {
-        const type = file.get_attribute_as_string(fastContentType);
+      for await (const fileInfo of enumerator) {
+        const type = fileInfo.get_attribute_as_string(fastContentType);
 
         if (type?.startsWith("image")) {
           info.push([
-            file.get_display_name(),
-            file.get_attribute_as_string(thumbnailPath) || "",
+            fileInfo.get_display_name(),
+            fileInfo.get_attribute_as_string(thumbnailPath) || "",
           ]);
         }
-
-        file = enumerator.next_file(null);
       }
     }
 
+    this.#wallpapers = info;
     return info;
   }
 }
