@@ -59,12 +59,14 @@ export default () => {
       <For each={notifications}>
         {(notif) => {
           const remove = timeout(TIMEOUT_DELAY, () => notif.dismiss());
+          const id = notif.id; // used later to check if the notification still exists
+
           return (
             <Notification
               notification={notif}
               onHoverLeave={() => {
                 remove.cancel();
-                notif.dismiss();
+                notifd.get_notification(id)?.dismiss();
               }}
               setup={() => remove}
             />
