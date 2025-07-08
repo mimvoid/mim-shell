@@ -83,7 +83,7 @@ export default (player: Mpris.Player) => {
   const Artist = (
     <label
       class="media-artist"
-      label={createBinding(player, "artist")}
+      label={createBinding(player, "artist").as((a) => a || "")}
       justify={Gtk.Justification.CENTER}
       wrap
     />
