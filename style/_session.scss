@@ -32,18 +32,8 @@
 
   .box {
     border-radius: 2px;
-    filter: drop-shadow(var(--shadow), 2px, 2px, 16px);
 
-    &:focus {
-      border-radius: var(--radius);
-      color: var(--primary);
-      background-color: rgb(from var(--base) r g b / 0.7);
-
-      image {
-        -gtk-icon-size: 4.75rem;
-      }
-    }
-
+    &:focus,
     &:hover {
       border-radius: var(--radius);
 
@@ -54,6 +44,17 @@
       image {
         -gtk-icon-size: 5rem;
       }
+    }
+  }
+
+  // Make focused boxes less prominent when another box is hovered
+  > grid:hover .box:focus:not(:hover) {
+    border-radius: var(--radius);
+    color: var(--primary);
+    background-color: rgb(from var(--base) r g b / 0.7);
+
+    image {
+      -gtk-icon-size: 4.75rem;
     }
   }
 

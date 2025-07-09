@@ -42,9 +42,12 @@
 }
 
 @mixin color-toggle($color) {
-  background-color: var(--box);
+  background-color: var(--box-dim);
   color: $color;
 
+  &:focus-within {
+    background-color: var(--box);
+  }
   &:hover {
     background-color: var(--box-bright);
   }
@@ -53,6 +56,9 @@
     background-color: $color;
     color: var(--base);
 
+    &:focus-within {
+      background-color: hsl(from $color h s calc(l + 5%) / alpha);
+    }
     &:hover {
       background-color: hsl(from $color h s calc(l + 10%) / alpha);
       color: var(--base);

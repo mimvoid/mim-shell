@@ -92,8 +92,13 @@ popover.media {
 
     &:focus,
     &:hover {
+      transform: translateY(-2px);
       color: var(--primary-bright);
       background-color: transparent;
+
+      image {
+        filter: drop-shadow(0 0 1px var(--tertiary));
+      }
     }
 
     &.play-pause {

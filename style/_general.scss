@@ -43,6 +43,14 @@ popover {
   background-color: rgb(from var(--base) r g b / 0.9);
   color: var(--string);
 
+  button:focus-within {
+    background-color: var(--box);
+
+    &.big-toggle:not(:checked) {
+      background-color: var(--box-bright);
+    }
+  }
+
   label {
     font-size: inherit;
   }
