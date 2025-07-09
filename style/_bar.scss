@@ -134,12 +134,8 @@
     min-width: 0.5rem;
   }
 }
-.wlsunset-toggle {
-  @include looks.transition;
-
-  &.off image {
-    color: var(--tertiary);
-  }
+.wlsunset-toggle:not(:checked) {
+  color: var(--tertiary);
 }
 
 .session-launch {
