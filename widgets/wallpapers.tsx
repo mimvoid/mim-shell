@@ -40,10 +40,12 @@ function wallpaperItem(
 }
 
 async function appendWallpapers(self: Gtk.Box, wallpapers: Wallpapers) {
+  const scope = getScope();
   const wallpaperInfo = await wallpapers.loadWallpapers();
 
   for (let i = 0, len = wallpaperInfo.length; i < len; i++) {
-    self.append(wallpaperItem(wallpapers, wallpaperInfo[i]));
+    const item = scope.run(() => wallpaperItem(wallpapers, wallpaperInfo[i]));
+    self.append(item);
   }
 }
 
@@ -60,6 +62,8 @@ export default () => {
     hexpand: true,
     vexpand: true,
   });
+
+  const wallpapers = Wallpapers.get_default();
 
   return (
     <window
@@ -89,12 +93,11 @@ export default () => {
       <scrolledwindow hscrollbarPolicy={EXTERNAL} vscrollbarPolicy={NEVER}>
         <box
           $={(self) => {
-            const scope = getScope();
-            const wallpapers = Wallpapers.get_default();
-
             // Lazy load wallpaper items
+            const scope = getScope();
             const mapHandler = self.connect("map", (_self) => {
               Spinner.start();
+
               scope.run(() =>
                 appendWallpapers(_self, wallpapers).then(() => {
                   _self.remove(Spinner);
