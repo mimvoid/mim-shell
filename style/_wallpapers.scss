@@ -1,16 +1,36 @@
 @use "abstracts/fonts";
+@use "abstracts/looks";
 
 .wallpaper-picker {
-  @include fonts.font-size;
+  @include fonts.menu-size;
 
   scrolledwindow {
-    padding: 1rem;
+    padding: 1.25rem;
     background-color: var(--base);
-
   }
 
-  button {
-    padding: 1rem;
+  picture {
+    @include looks.radius(0.5);
+  }
+
+  .item {
+    @include looks.radius(0.4);
+    transform: scale(0.85);
+    padding: 0.75rem 0;
+
+    &:focus-within,
+    &:hover {
+      transform: scale(1);
+      padding: 0.75rem;
+
+      color: var(--base);
+      background-color: var(--accent);
+      font-weight: bold;
+
+      picture {
+        box-shadow: 0 0 4px var(--base);
+      }
+    }
   }
 
   .with-spinner {

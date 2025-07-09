@@ -18,21 +18,15 @@ function wallpaperItem(
       onClicked={() => wallpapers.setWallpaper(Wallpapers.directory + fileName)}
     >
       <box orientation={Gtk.Orientation.VERTICAL} spacing={8}>
-        <overlay
-          $={(self) => {
-            self.set_measure_overlay(Pic, true);
-            self.set_clip_overlay(Pic, true);
-          }}
-        >
-          <box heightRequest={120} widthRequest={240} />
-          <Gtk.Picture
-            $={(self) => (Pic = self)}
-            $type="overlay"
-            file={Gio.File.new_for_path(
-              thumbnail || Wallpapers.directory + fileName,
-            )}
-          />
-        </overlay>
+        <Gtk.Picture
+          $={(self) => (Pic = self)}
+          heightRequest={144}
+          widthRequest={256}
+          file={Gio.File.new_for_path(
+            thumbnail || Wallpapers.directory + fileName,
+          )}
+          contentFit={Gtk.ContentFit.COVER}
+        />
         <label class="filename" label={fileName} />
       </box>
     </button>
@@ -83,6 +77,7 @@ export default () => {
       marginRight={12}
       marginBottom={12}
       marginLeft={12}
+      onMap={(self) => self.grab_focus()}
       application={app}
     >
       <Gtk.EventControllerKey
@@ -109,7 +104,6 @@ export default () => {
             });
           }}
           class="with-spinner"
-          spacing={8}
         >
           {Spinner}
         </box>
