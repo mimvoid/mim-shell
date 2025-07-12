@@ -28,6 +28,7 @@ export default class Wallpapers extends GObject.Object {
   #wallpapers: Gtk.FilterListModel;
 
   @property(Boolean) loading: boolean;
+  @property(Boolean) monitored: boolean;
 
   constructor() {
     super();
@@ -44,6 +45,14 @@ export default class Wallpapers extends GObject.Object {
       this,
       "loading",
       GObject.BindingFlags.SYNC_CREATE,
+    );
+
+    this.monitored = this.#directoryList.monitored;
+    this.#directoryList.bind_property(
+      "monitored",
+      this,
+      "monitored",
+      GObject.BindingFlags.BIDIRECTIONAL,
     );
 
     const filter = new Gtk.FileFilter();

@@ -37,6 +37,12 @@ export default () => {
           );
         }
       }}
+      onDestroy={(self) => {
+        const model = (self.model as Gtk.SingleSelection).get_model();
+        if (model instanceof Gtk.DirectoryList) {
+          model.monitored = false;
+        }
+      }}
     />
   ) as Gtk.ListView;
 };
