@@ -1,7 +1,7 @@
 import GObject, { register, getter, setter } from "ags/gobject";
 import { Gtk } from "ags/gtk4";
 import { interval, timeout } from "ags/time";
-import { UInt, RevealerTransitionType } from "@lib/GObjectTypes";
+import { RevealerTransitionType } from "@lib/GObjectTypes";
 
 interface PopRevealerProps extends Gtk.Popover.ConstructorProps {
   transitionDuration: number;
@@ -10,7 +10,7 @@ interface PopRevealerProps extends Gtk.Popover.ConstructorProps {
 
 @register({ GTypeName: "PopRevealer", Implements: [Gtk.Buildable] })
 export default class PopRevealer extends Gtk.Popover {
-  #revealer: Gtk.Revealer;
+  #revealer = new Gtk.Revealer();
 
   constructor({
     child,
@@ -20,23 +20,18 @@ export default class PopRevealer extends Gtk.Popover {
   }: Partial<PopRevealerProps>) {
     super({ ...props });
 
-    this.#revealer = (
-      <revealer
-        transitionDuration={transitionDuration}
-        transitionType={transitionType}
-      >
-        {child}
-      </revealer>
-    ) as Gtk.Revealer;
-
+    if (child) this.#revealer.set_child(child);
     this.set_child(this.#revealer);
+
+    this.transitionDuration = transitionDuration;
+    this.transitionType = transitionType;
   }
 
-  @getter(UInt)
+  @getter({ $gtype: GObject.TYPE_UINT })
   get transitionDuration() {
     return this.#revealer.transitionDuration;
   }
-  @setter(UInt)
+  @setter({ $gtype: GObject.TYPE_UINT })
   set transitionDuration(duration) {
     this.#revealer.transitionDuration = duration;
     this.notify("transition-duration");

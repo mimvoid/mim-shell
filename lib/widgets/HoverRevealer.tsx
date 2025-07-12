@@ -1,6 +1,6 @@
 import GObject, { register, getter, setter } from "ags/gobject";
 import { Astal, Gtk } from "ags/gtk4";
-import { UInt, RevealerTransitionType } from "@lib/GObjectTypes";
+import { RevealerTransitionType } from "@lib/GObjectTypes";
 
 interface HoverRevealerProps extends Gtk.Revealer.ConstructorProps {
   hiddenChild: GObject.Object;
@@ -55,11 +55,11 @@ export default class HoverRevealer extends Astal.Box {
     this.notify("hidden-child");
   }
 
-  @getter(UInt)
+  @getter({ $gtype: GObject.TYPE_UINT })
   get transitionDuration() {
     return this.#revealer.transitionDuration;
   }
-  @setter(UInt)
+  @setter({ $gtype: GObject.TYPE_UINT })
   set transitionDuration(duration) {
     this.#revealer.transitionDuration = duration;
     this.notify("transition-duration");

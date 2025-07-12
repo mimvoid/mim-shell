@@ -1,14 +1,14 @@
 import { Astal, Gtk } from "ags/gtk4";
 import GObject, { register, getter, setter } from "ags/gobject";
 import { pointer } from "@lib/utils";
-import { UInt, RevealerTransitionType } from "@lib/GObjectTypes";
+import { RevealerTransitionType } from "@lib/GObjectTypes";
 
 interface DropdownProps extends Gtk.Revealer.ConstructorProps {
   label: GObject.Object | string;
 }
 
 @register({ GTypeName: "Dropdown", Implements: [Gtk.Buildable] })
-export default class Dropdown extends Astal.Box {
+export default class Dropdown extends Astal.Bin {
   #revealer: Gtk.Revealer;
 
   constructor({
@@ -19,7 +19,7 @@ export default class Dropdown extends Astal.Box {
     transitionType = Gtk.RevealerTransitionType.SLIDE_DOWN,
     ...props
   }: Partial<DropdownProps>) {
-    super({ vertical: true });
+    super({ cssClasses: revealChild ? ["dropdown", "open"] : ["dropdown"] });
 
     this.#revealer = (
       <revealer
@@ -37,42 +37,42 @@ export default class Dropdown extends Astal.Box {
       </revealer>
     ) as Gtk.Revealer;
 
-    this.set_children([
+    this.set_child(
       (
-        <button
-          $={pointer}
-          onClicked={() =>
-            (this.#revealer.revealChild = !this.#revealer.revealChild)
-          }
-          hexpand
-        >
-          <box spacing={6}>
-            <image iconName="pan-down-symbolic" />
-            {label instanceof Gtk.Widget ? (
-              label
-            ) : (
-              <label label={label?.toString()} />
-            )}
-          </box>
-        </button>
-      ) as Gtk.Button,
-      this.#revealer,
-    ]);
+        <box orientation={Gtk.Orientation.VERTICAL}>
+          <button
+            $={pointer}
+            class="dropdown-button"
+            hexpand
+            onClicked={() =>
+              (this.#revealer.revealChild = !this.#revealer.revealChild)
+            }
+          >
+            <box spacing={6}>
+              <image iconName="pan-down-symbolic" />
+              {label instanceof Gtk.Widget ? (
+                label
+              ) : (
+                <label label={label?.toString()} />
+              )}
+            </box>
+          </button>
+          {this.#revealer}
+        </box>
+      ) as Gtk.Box,
+    );
 
-    const realizeId = this.connect("realize", () => {
-      this.add_css_class("dropdown");
-      this.add_css_class("section");
-      if (revealChild) this.add_css_class("open");
-
-      this.disconnect(realizeId);
+    const realizeId = this.connect("realize", (self) => {
+      self.add_css_class("dropdown");
+      self.disconnect(realizeId);
     });
   }
 
-  @getter(UInt)
+  @getter({ $gtype: GObject.TYPE_UINT })
   get transitionDuration() {
     return this.#revealer.transitionDuration;
   }
-  @setter(UInt)
+  @setter({ $gtype: GObject.TYPE_UINT })
   set transitionDuration(duration) {
     this.#revealer.transitionDuration = duration;
     this.notify("transition-duration");
