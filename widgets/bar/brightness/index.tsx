@@ -1,15 +1,13 @@
-import { createBinding } from "ags";
+import { With, createBinding } from "ags";
 import { Gtk } from "ags/gtk4";
 import WlSunset from "./wlsunset";
 
-import Brightness from "@services/brightness";
+import Brightness, { Backlight } from "@services/brightness";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
 import { drawValuePercentage, pointer } from "@lib/utils";
 
 // Brightness label & slider
-function BrightnessBox() {
-  const brightness = Brightness.get_default();
-
+function BrightnessSlider(device: Backlight) {
   // Change brightness on drag
   const Slider = (
     <slider
@@ -17,19 +15,25 @@ function BrightnessBox() {
         pointer(self);
         drawValuePercentage(self);
       }}
-      value={createBinding(brightness, "light")}
+      value={createBinding(device, "percentage")}
       valign={Gtk.Align.CENTER}
       hexpand
-      onChangeValue={({ value }) => void (brightness.light = value)}
+      onChangeValue={({ value }) => void (device.percentage = value)}
     />
   );
 
   return <HoverRevealer hiddenChild={Slider} />;
 }
 
-export default () => (
-  <box class="brightness">
-    <WlSunset />
-    <BrightnessBox />
-  </box>
-);
+export default () => {
+  const brightness = Brightness.get_default();
+
+  return (
+    <box class="brightness">
+      <WlSunset />
+      <With value={createBinding(brightness, "devices")}>
+        {(devices: Backlight[]) => devices[0] && BrightnessSlider(devices[0])}
+      </With>
+    </box>
+  );
+};
