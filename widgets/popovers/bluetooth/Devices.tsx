@@ -24,7 +24,7 @@ function DeviceWidget(device: Bluetooth.Device) {
       )}
     </box>
   );
-  const DeviceIcon = new Gtk.Image({ iconName: device.icon });
+  const DeviceIcon = Gtk.Image.new_from_icon_name(device.icon);
 
   return (
     <button
@@ -53,7 +53,7 @@ export default () => {
   const ConnectedBox = (
     <box orientation={VERTICAL} visible={isConnected} />
   ) as Gtk.Box;
-  const DisconnectedBox = new Gtk.Box({ orientation: VERTICAL });
+  const DisconnectedBox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0);
 
   function addWidget(device: Bluetooth.Device) {
     const widget = DeviceWidget(device);

@@ -95,8 +95,8 @@ function Actions() {
       initialName: "color-history.json",
     });
 
-    FilePicker.save(null, null, (_, res) => {
-      const newPath = FilePicker.save_finish(res)?.get_path();
+    FilePicker.save(null, null, (filePicker, res) => {
+      const newPath = filePicker?.save_finish(res)?.get_path();
       if (newPath) writeFile(newPath, JSON.stringify(picker.colors));
     });
   }

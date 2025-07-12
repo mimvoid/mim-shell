@@ -57,11 +57,7 @@ export default class Wallpapers extends GObject.Object {
 
     const filter = new Gtk.FileFilter();
     filter.add_mime_type("image/*");
-
-    this.#wallpapers = new Gtk.FilterListModel({
-      model: this.#directoryList,
-      filter: filter,
-    });
+    this.#wallpapers = Gtk.FilterListModel.new(this.#directoryList, filter);
 
     monitorFile("./style/palette/_matugen.scss", (_, e) => {
       if (e !== Gio.FileMonitorEvent.CHANGED) return;

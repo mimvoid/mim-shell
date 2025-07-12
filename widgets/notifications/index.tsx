@@ -16,9 +16,8 @@ export default () => {
 
   const { TOP, RIGHT } = Astal.WindowAnchor;
 
-  const [notifications, setNotifications] = createState(
-    new Array<Notifd.Notification>(),
-  );
+  const [notifications, setNotifications] =
+    createState(Array<Notifd.Notification>());
 
   const notifiedId = notifd.connect("notified", (notifdSrc, id, replaced) => {
     const notification = notifdSrc.get_notification(id);

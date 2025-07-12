@@ -6,9 +6,9 @@ import HoverRevealer from "@lib/widgets/HoverRevealer";
 import { pointer } from "@lib/utils";
 import NetworkPopover from "../popovers/network";
 
-const network = Network.get_default();
-
 export default () => {
+  const network = Network.get_default();
+
   const Icon = (
     <button
       $={pointer}
