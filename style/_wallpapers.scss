@@ -17,19 +17,19 @@
     @include looks.radius(0.4);
     transform: scale(0.85);
     padding: 0.75rem 0;
+  }
 
-    &:focus-within,
-    &:hover {
-      transform: scale(1);
-      padding: 0.75rem;
+  row:focus-within .item,
+  row:hover .item {
+    transform: scale(1);
+    padding: 0.75rem;
 
-      color: var(--base);
-      background-color: var(--accent);
-      font-weight: bold;
+    color: var(--base);
+    background-color: var(--accent);
+    font-weight: bold;
 
-      picture {
-        box-shadow: 0 0 4px var(--base);
-      }
+    picture {
+      box-shadow: 0 0 4px var(--base);
     }
   }
 

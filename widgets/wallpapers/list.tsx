@@ -28,7 +28,6 @@ export default () => {
       factory={factory}
       singleClickActivate
       orientation={Gtk.Orientation.HORIZONTAL}
-      visible={false}
       onActivate={(self, position) => {
         const file = self.model.get_item(position);
         if (file instanceof Gio.FileInfo) {
