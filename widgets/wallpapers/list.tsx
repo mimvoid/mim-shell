@@ -1,0 +1,42 @@
+import Wallpapers from "@services/wallpapers";
+import { Gtk } from "ags/gtk4";
+import Gio from "gi://Gio?version=2.0";
+import WallpaperItem from "./item";
+
+export default () => {
+  const wallpapers = Wallpapers.get_default().wallpapers;
+  const selection = Gtk.SingleSelection.new(wallpapers);
+
+  const factory = new Gtk.SignalListItemFactory();
+  factory.connect("setup", (_, item) => {
+    const listItem = item as Gtk.ListItem;
+    listItem.set_child(new WallpaperItem());
+  });
+
+  factory.connect("bind", (_, item) => {
+    const listItem = item as Gtk.ListItem;
+    const fileInfo = listItem.item;
+
+    if (fileInfo instanceof Gio.FileInfo) {
+      (listItem.child as WallpaperItem).setFileInfo(fileInfo);
+    }
+  });
+
+  return (
+    <Gtk.ListView
+      model={selection}
+      factory={factory}
+      singleClickActivate
+      orientation={Gtk.Orientation.HORIZONTAL}
+      visible={false}
+      onActivate={(self, position) => {
+        const file = self.model.get_item(position);
+        if (file instanceof Gio.FileInfo) {
+          Wallpapers.setWallpaper(
+            Wallpapers.directory + file.get_display_name(),
+          );
+        }
+      }}
+    />
+  ) as Gtk.ListView;
+};
