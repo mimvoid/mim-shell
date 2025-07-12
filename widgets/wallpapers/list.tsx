@@ -7,20 +7,21 @@ export default () => {
   const wallpapers = Wallpapers.get_default().wallpapers;
   const selection = Gtk.SingleSelection.new(wallpapers);
 
-  const factory = new Gtk.SignalListItemFactory();
-  factory.connect("setup", (_, item) => {
-    const listItem = item as Gtk.ListItem;
-    listItem.set_child(new WallpaperItem());
-  });
+  const factory = (
+    <Gtk.SignalListItemFactory
+      onSetup={(_, item) =>
+        (item as Gtk.ListItem).set_child(new WallpaperItem())
+      }
+      onBind={(_, item) => {
+        const listItem = item as Gtk.ListItem;
+        const fileInfo = listItem.item;
 
-  factory.connect("bind", (_, item) => {
-    const listItem = item as Gtk.ListItem;
-    const fileInfo = listItem.item;
-
-    if (fileInfo instanceof Gio.FileInfo) {
-      (listItem.child as WallpaperItem).setFileInfo(fileInfo);
-    }
-  });
+        if (fileInfo instanceof Gio.FileInfo) {
+          (listItem.child as WallpaperItem).setFileInfo(fileInfo);
+        }
+      }}
+    />
+  ) as Gtk.SignalListItemFactory;
 
   return (
     <Gtk.ListView
