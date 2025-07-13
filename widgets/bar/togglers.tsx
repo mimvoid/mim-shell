@@ -7,16 +7,14 @@ import { pointer } from "@lib/utils";
 
 // Toggle mpris media widget menu
 export const Media = () => (
-  <menubutton $={pointer}>
-    <image class="media-launch" iconName={Icon.mimetypes.audio} />
+  <menubutton $={pointer} class="media-launch" iconName={Icon.mimetypes.audio}>
     <MediaPopover />
   </menubutton>
 );
 
 // Toggle the dashboard
 export const Dashboard = () => (
-  <menubutton>
-    <button $={pointer} class="dashboard-launch" iconName={Icon.overview} />
+  <menubutton $={pointer} class="dashboard-launch" iconName={Icon.overview}>
     <DashboardPopover />
   </menubutton>
 );

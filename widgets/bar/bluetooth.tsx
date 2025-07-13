@@ -40,13 +40,11 @@ export default () => {
   );
 
   return (
-    <box class="bluetooth">
-      <menubutton>
-        <HoverRevealer hiddenChild={DeviceName}>
-          <Indicator />
-        </HoverRevealer>
-        <BluetoothPopover />
-      </menubutton>
-    </box>
+    <menubutton class="bluetooth">
+      <HoverRevealer hiddenChild={DeviceName}>
+        <Indicator />
+      </HoverRevealer>
+      <BluetoothPopover />
+    </menubutton>
   );
 };

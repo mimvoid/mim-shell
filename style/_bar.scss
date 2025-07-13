@@ -10,6 +10,7 @@
   }
 
   .left {
+    padding-left: 0.5em;
     padding-right: 1em;
   }
   .center {
@@ -25,7 +26,7 @@
 /* Modules */
 /*---------*/
 
-.dashboard-launch image {
+.dashboard-launch {
   color: var(--tertiary-dim);
 }
 
@@ -88,9 +89,7 @@
 }
 
 .colorpicker {
-  menubutton {
-    color: var(--primary-dim);
-  }
+  color: var(--primary-dim);
 
   .color-display {
     button {

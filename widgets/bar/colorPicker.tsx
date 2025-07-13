@@ -23,46 +23,38 @@ export default () => {
     />
   );
 
-  function Color() {
-    function colorSub(self: Gtk.ColorDialogButton) {
-      const newRgba = new Gdk.RGBA();
-      if (newRgba.parse(lastColor.get())) {
-        self.rgba = newRgba;
-      }
+  function colorSub(self: Gtk.ColorDialogButton) {
+    const newRgba = new Gdk.RGBA();
+    if (newRgba.parse(lastColor.get())) {
+      self.rgba = newRgba;
     }
-
-    // A circle showing the last picked color
-    const colorDisplay = (
-      <Gtk.ColorDialogButton
-        $={(self) => {
-          colorSub(self);
-          lastColor.subscribe(() => colorSub(self));
-        }}
-        class="color-display"
-      />
-    );
-
-    // Include a color label and the circle
-    return (
-      <menubutton>
-        <HoverRevealer
-          hiddenChild={
-            <box class="color-box">
-              <label label={lastColor} />
-              {colorDisplay}
-            </box>
-          }
-        >
-          {Trigger}
-        </HoverRevealer>
-        <ColorsPopover />
-      </menubutton>
-    );
   }
 
+  // A circle showing the last picked color
+  const colorDisplay = (
+    <Gtk.ColorDialogButton
+      $={(self) => {
+        colorSub(self);
+        lastColor.subscribe(() => colorSub(self));
+      }}
+      class="color-display"
+    />
+  );
+
   return (
-    <box class="colorpicker">
-      <Color />
-    </box>
+    <menubutton class="colorpicker">
+      <HoverRevealer
+        hiddenChild={
+          // Include a color label and color circle
+          <box class="color-box">
+            <label label={lastColor} />
+            {colorDisplay}
+          </box>
+        }
+      >
+        {Trigger}
+      </HoverRevealer>
+      <ColorsPopover />
+    </menubutton>
   );
 };
