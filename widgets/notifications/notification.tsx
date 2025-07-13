@@ -1,13 +1,11 @@
 // Defines an individual notification widget
 
-import { pointer } from "@lib/utils";
 import { Gtk, Gdk } from "ags/gtk4";
+import { timeout } from "ags/time";
 import Notifd from "gi://AstalNotifd";
 import GLib from "gi://GLib?version=2.0";
 import Pango from "gi://Pango";
-
-const { START, CENTER, END } = Gtk.Align;
-const { VERTICAL } = Gtk.Orientation;
+import { pointer } from "@lib/utils";
 
 function isIcon(icon: string | null) {
   if (!icon) return false;
@@ -17,7 +15,7 @@ function isIcon(icon: string | null) {
 }
 
 function fileExists(path: string) {
-  return GLib.file_test(path, GLib.FileTest.EXISTS);
+  return !!path && GLib.file_test(path, GLib.FileTest.EXISTS);
 }
 
 function time(time: number, format = "%H:%M") {
@@ -35,26 +33,14 @@ function urgency(n: Notifd.Notification) {
   }
 }
 
-type Props = {
-  notification: Notifd.Notification;
-  onHoverLeave(source: Gtk.EventControllerMotion): void;
-  setup(self: Gtk.Box): void;
-};
+export default (n: Notifd.Notification) => {
+  const { START, END } = Gtk.Align;
+  const { VERTICAL } = Gtk.Orientation;
+  const TIMEOUT_DELAY = 5000;
 
-export default ({ notification: n, onHoverLeave, setup }: Props) => {
   function makeImage() {
-    if (!n.image) return;
     if (isIcon(n.image)) {
-      return (
-        <image
-          class="icon-image"
-          iconName={n.image}
-          hexpand
-          vexpand
-          halign={CENTER}
-          valign={CENTER}
-        />
-      );
+      return <image class="icon-image" iconName={n.image} />;
     } else if (fileExists(n.image)) {
       return <image class="image" valign={START} file={n.image} />;
     }
@@ -64,7 +50,6 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
     if (n.appIcon) {
       return <image class="app-icon" iconName={n.appIcon} />;
     }
-
     return (
       makeImage() || (
         <image class="app-icon" iconName="dialog-information-symbolic" />
@@ -90,21 +75,21 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
       <label
         label={n.summary}
         class="summary"
-        wrap
         widthChars={36}
         maxWidthChars={36}
         xalign={0}
+        wrap
         halign={START}
       />
       {n.body && (
         <label
           label={n.body}
           class="body"
-          wrap
           widthChars={36}
           maxWidthChars={36}
-          useMarkup
           xalign={0}
+          wrap
+          useMarkup
           halign={START}
         />
       )}
@@ -121,9 +106,12 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
         !!n.get_actions()[0] && (
           <box class="actions">
             {n.get_actions().map(({ label, id }) => (
-              <button $={pointer} onClicked={() => n.invoke(id)} hexpand>
-                <label label={label} halign={CENTER} hexpand />
-              </button>
+              <button
+                $={pointer}
+                label={label}
+                onClicked={() => n.invoke(id)}
+                hexpand
+              />
             ))}
           </box>
         )
@@ -131,19 +119,11 @@ export default ({ notification: n, onHoverLeave, setup }: Props) => {
     </box>
   );
 
-  // Put everything together
-  const NotifBox = (
-    <box class="notification">
+  timeout(TIMEOUT_DELAY, () => n.dismiss());
+  return (
+    <box cssClasses={["notification", urgency(n)]}>
       <Icon />
       {Main}
     </box>
-  );
-
-  // Handle urgency & events
-  return (
-    <box $={setup} class={urgency(n)}>
-      <Gtk.EventControllerMotion onLeave={onHoverLeave} />
-      {NotifBox}
-    </box>
-  );
+  ) as Gtk.Box;
 };

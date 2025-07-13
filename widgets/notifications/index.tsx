@@ -1,79 +1,64 @@
+import { For, createBinding, getScope } from "ags";
+import GObject from "ags/gobject";
 import app from "ags/gtk4/app";
-import { For, createBinding, createState, onCleanup } from "ags";
 import { Astal, Gtk } from "ags/gtk4";
-import { timeout } from "ags/time";
 
+import Gio from "gi://Gio?version=2.0";
 import Notifd from "gi://AstalNotifd";
+
 import { setLayerrules } from "@lib/utils";
 import Notification from "./notification";
+import NotificationList from "./notifList";
 
-export default () => {
-  const monitors = createBinding(app, "monitors");
+function isCritical(item: GObject.Object) {
+  return (
+    item instanceof Notifd.Notification &&
+    item.urgency === Notifd.Urgency.CRITICAL
+  );
+}
+
+function notifWidgetList(notifs: Gio.ListStore) {
+  const filter = Gtk.CustomFilter.new(null);
+  const notifModel = Gtk.FilterListModel.new(notifs, filter);
 
   const notifd = Notifd.get_default();
-  const TIMEOUT_DELAY = 5000;
+  const dndHandler = notifd.connect("notify::dont-disturb", (notifdSrc) => {
+    filter.set_filter_func(notifdSrc.dontDisturb ? isCritical : null);
+  });
+
+  const scope = getScope();
+  function setListItem(
+    _factory: Gtk.SignalListItemFactory,
+    item: GObject.Object,
+  ) {
+    const listItem = item as Gtk.ListItem;
+    const notif = listItem.item;
+    if (notif instanceof Notifd.Notification) {
+      scope.run(() =>
+        listItem.set_child(Notification(notif)),
+      );
+    }
+  }
+
+  return (
+    <Gtk.ListView
+      class="notifications"
+      model={Gtk.NoSelection.new(notifModel)}
+      factory={
+        <Gtk.SignalListItemFactory onSetup={setListItem} onBind={setListItem} />
+      }
+      onDestroy={() => notifd.disconnect(dndHandler)}
+    />
+  );
+}
+
+export default () => {
+  const { TOP, RIGHT } = Astal.WindowAnchor;
+  const monitors = createBinding(app, "monitors");
   const WINDOW_NAME = "notification-window";
 
-  const { TOP, RIGHT } = Astal.WindowAnchor;
-
-  const [notifications, setNotifications] =
-    createState(Array<Notifd.Notification>());
-
-  const notifiedId = notifd.connect("notified", (notifdSrc, id, replaced) => {
-    const notification = notifdSrc.get_notification(id);
-    if (
-      notifdSrc.dontDisturb &&
-      !replaced &&
-      notification.urgency !== Notifd.Urgency.CRITICAL
-    ) {
-      return;
-    }
-
-    if (replaced) {
-      const notifs = notifications.get();
-
-      for (let i = 0, len = notifs.length; i < len; i++) {
-        if (notifs[i].id === id) {
-          notifs[i] = notification;
-          setNotifications([...notifs]);
-          return;
-        }
-      }
-    }
-
-    setNotifications((ns) => [notification, ...ns]);
-  });
-
-  const resolvedId = notifd.connect("resolved", (_, id) => {
-    setNotifications((ns) => ns.filter((n) => n.id !== id));
-  });
-
-  onCleanup(() => {
-    notifd.disconnect(notifiedId);
-    notifd.disconnect(resolvedId);
-  });
-
-  const Notifications = (
-    <box class="notifications" orientation={Gtk.Orientation.VERTICAL}>
-      <For each={notifications}>
-        {(notif) => {
-          const remove = timeout(TIMEOUT_DELAY, () => notif.dismiss());
-          const id = notif.id; // used later to check if the notification still exists
-
-          return (
-            <Notification
-              notification={notif}
-              onHoverLeave={() => {
-                remove.cancel();
-                notifd.get_notification(id)?.dismiss();
-              }}
-              setup={() => remove}
-            />
-          );
-        }}
-      </For>
-    </box>
-  );
+  const notifications = NotificationList();
+  const hasNotifs = createBinding(notifications, "n_items").as((n) => n > 0);
 
   return (
     <For each={monitors} cleanup={(win) => (win as Gtk.Window).destroy()}>
@@ -87,7 +72,7 @@ export default () => {
               "xray 0",
             ])
           }
-          visible={notifications((ns) => !!ns[0])}
+          visible={hasNotifs}
           name={WINDOW_NAME}
           namespace={WINDOW_NAME}
           class="notification-popups transparent"
@@ -95,7 +80,7 @@ export default () => {
           exclusivity={Astal.Exclusivity.EXCLUSIVE}
           anchor={TOP | RIGHT}
         >
-          {Notifications}
+          {notifWidgetList(notifications)}
         </window>
       )}
     </For>
