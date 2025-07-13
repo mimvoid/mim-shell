@@ -52,10 +52,19 @@ function notifWidgetList(notifs: Gio.ListStore) {
   );
 }
 
+function winInit(win: Astal.Window) {
+  win.namespace = win.name;
+  setLayerrules(win.namespace, [
+    "animation slidefade right",
+    "blur",
+    "ignorezero",
+    "xray 0",
+  ]);
+}
+
 export default () => {
   const { TOP, RIGHT } = Astal.WindowAnchor;
   const monitors = createBinding(app, "monitors");
-  const WINDOW_NAME = "notification-window";
 
   const notifications = NotificationList();
   const hasNotifs = createBinding(notifications, "n_items").as((n) => n > 0);
@@ -64,17 +73,9 @@ export default () => {
     <For each={monitors} cleanup={(win) => (win as Gtk.Window).destroy()}>
       {(monitor) => (
         <window
-          $={(self) =>
-            setLayerrules(self.namespace, [
-              "animation slidefade right",
-              "blur",
-              "ignorezero",
-              "xray 0",
-            ])
-          }
+          $={winInit}
           visible={hasNotifs}
-          name={WINDOW_NAME}
-          namespace={WINDOW_NAME}
+          name="notification-window"
           class="notification-popups transparent"
           gdkmonitor={monitor}
           exclusivity={Astal.Exclusivity.EXCLUSIVE}

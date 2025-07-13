@@ -34,14 +34,15 @@ function urgency(n: Notifd.Notification) {
 }
 
 export default (n: Notifd.Notification) => {
-  const { START, END } = Gtk.Align;
+  const { START } = Gtk.Align;
   const { VERTICAL } = Gtk.Orientation;
   const TIMEOUT_DELAY = 5000;
 
   function makeImage() {
     if (isIcon(n.image)) {
       return <image class="icon-image" iconName={n.image} />;
-    } else if (fileExists(n.image)) {
+    }
+    if (fileExists(n.image)) {
       return <image class="image" valign={START} file={n.image} />;
     }
   }
@@ -64,66 +65,56 @@ export default (n: Notifd.Notification) => {
         label={n.appName || "Unknown"}
         ellipsize={Pango.EllipsizeMode.END}
         halign={START}
+        hexpand
       />
-      <label label={time(n.time)} class="time" hexpand halign={END} />
+      <label label={time(n.time)} class="time" />
     </box>
   );
 
-  const Content = (
-    <box class="content" orientation={VERTICAL}>
-      {n.appIcon && makeImage()}
-      <label
-        label={n.summary}
-        class="summary"
-        widthChars={36}
-        maxWidthChars={36}
-        xalign={0}
-        wrap
-        halign={START}
-      />
-      {n.body && (
-        <label
-          label={n.body}
-          class="body"
-          widthChars={36}
-          maxWidthChars={36}
-          xalign={0}
-          wrap
-          useMarkup
-          halign={START}
-        />
-      )}
-    </box>
-  );
-
-  // Put contents together
-  const Main = (
-    <box orientation={VERTICAL}>
-      {Header}
-      {Content}
-      {
-        // Create a button for each action if they exist
-        !!n.get_actions()[0] && (
-          <box class="actions">
-            {n.get_actions().map(({ label, id }) => (
-              <button
-                $={pointer}
-                label={label}
-                onClicked={() => n.invoke(id)}
-                hexpand
-              />
-            ))}
-          </box>
-        )
-      }
-    </box>
-  );
+  // Create a button for each action if they exist
+  function actionButtons() {
+    const actions = n.get_actions();
+    if (!!actions[0])
+      return (
+        <box class="actions">
+          {actions.map(({ label, id }) => (
+            <button
+              $={pointer}
+              label={label}
+              hexpand
+              onClicked={() => n.invoke(id)}
+            />
+          ))}
+        </box>
+      );
+  }
 
   timeout(TIMEOUT_DELAY, () => n.dismiss());
   return (
     <box cssClasses={["notification", urgency(n)]}>
       <Icon />
-      {Main}
+      <box orientation={VERTICAL}>
+        {Header}
+        {n.appIcon && makeImage()}
+        <label
+          class="summary"
+          label={n.summary}
+          maxWidthChars={36}
+          xalign={0}
+          wrap
+        />
+        {n.body && (
+          <label
+            class="body"
+            label={n.body}
+            maxWidthChars={36}
+            xalign={0}
+            wrap
+            useMarkup
+          />
+        )}
+        {actionButtons()}
+      </box>
     </box>
   ) as Gtk.Box;
 };
