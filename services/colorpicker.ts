@@ -1,5 +1,5 @@
 import GObject, { register, getter, setter } from "ags/gobject";
-import { readFile, writeFileAsync } from "ags/file";
+import { readFileAsync, writeFileAsync } from "ags/file";
 import { execAsync, subprocess } from "ags/process";
 
 import Gio from "gi://Gio?version=2.0";
@@ -24,13 +24,16 @@ export default class Colorpicker extends GObject.Object {
   constructor() {
     super();
 
-    try {
-      this.#colors = JSON.parse(readFile(Colorpicker.storeFile));
-    } catch (err) {
-      err === Gio.IOErrorEnum.NOT_FOUND
-        ? writeFileAsync(Colorpicker.storeFile, "[]")
-        : console.error(err);
-    }
+    readFileAsync(Colorpicker.storeFile)
+      .then((content) => {
+        this.#colors = JSON.parse(content);
+        this.notify("colors");
+      })
+      .catch((err) => {
+        err === Gio.IOErrorEnum.NOT_FOUND
+          ? writeFileAsync(Colorpicker.storeFile, "[]")
+          : console.error(err);
+      });
   }
 
   @getter(Array<string>)

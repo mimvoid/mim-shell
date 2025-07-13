@@ -42,7 +42,7 @@ export default class Trash extends GObject.Object {
         ? "user-trash-symbolic"
         : "user-trash-full-symbolic";
 
-    this.#moveMonitor?.connect("changed", (_, file, otherFile, event) => {
+    this.#moveMonitor?.connect("changed", async (_, file, otherFile, event) => {
       switch (event) {
         case Gio.FileMonitorEvent.MOVED_OUT:
           if (--this.fileCount === 0) {

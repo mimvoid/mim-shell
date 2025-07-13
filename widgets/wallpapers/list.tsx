@@ -29,7 +29,7 @@ export default () => {
       factory={factory}
       singleClickActivate
       orientation={Gtk.Orientation.HORIZONTAL}
-      onActivate={(self, position) => {
+      onActivate={async (self, position) => {
         const file = self.model.get_item(position);
         if (file instanceof Gio.FileInfo) {
           Wallpapers.setWallpaper(

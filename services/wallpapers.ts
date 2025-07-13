@@ -23,7 +23,7 @@ export default class Wallpapers extends GObject.Object {
     ).catch(console.error);
   }
 
-  #directory: Gio.File;
+  #directory = Gio.File.new_for_path(Wallpapers.directory);
   #directoryList: Gtk.DirectoryList;
   #wallpapers: Gtk.FilterListModel;
 
@@ -33,7 +33,6 @@ export default class Wallpapers extends GObject.Object {
   constructor() {
     super();
 
-    this.#directory = Gio.File.new_for_path(Wallpapers.directory);
     this.#directoryList = Gtk.DirectoryList.new(
       "standard::display-name,standard::content-type,thumbnail::path",
       this.#directory,
@@ -59,7 +58,7 @@ export default class Wallpapers extends GObject.Object {
     filter.add_mime_type("image/*");
     this.#wallpapers = Gtk.FilterListModel.new(this.#directoryList, filter);
 
-    monitorFile("./style/palette/_matugen.scss", (_, e) => {
+    monitorFile("./style/palette/_matugen.scss", async (_, e) => {
       if (e !== Gio.FileMonitorEvent.CHANGED) return;
 
       execAsync("sass ./style/style.scss /tmp/ags/style.css")
