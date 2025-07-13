@@ -95,24 +95,33 @@ export default () => {
           <label class="title" label="Networks" halign={START} hexpand />
           {ScanButton}
         </box>
-        <For each={aps}>
-          {(ap) => (
-            <button
-              $={setupButton}
-              halign={FILL}
-              tooltipText={createBinding(ap, "strength").as((s) => `${s}%`)}
-              onClicked={() => connect(ap)}
-            >
-              <box>
-                <image iconName={createBinding(ap, "iconName")} />
-                <label label={ap.ssid} halign={START} hexpand />
-                {ap.requiresPassword && (
-                  <image class="lock" iconName={Icons.lock} />
-                )}
-              </box>
-            </button>
-          )}
-        </For>
+        <scrolledwindow
+          hscrollbarPolicy={Gtk.PolicyType.NEVER}
+          maxContentHeight={480}
+          propagateNaturalHeight
+        >
+          <box orientation={VERTICAL}>
+            <For each={aps}>
+              {(ap) => (
+                <button
+                  $={setupButton}
+                  class="access-point-button"
+                  halign={FILL}
+                  tooltipText={createBinding(ap, "strength").as((s) => `${s}%`)}
+                  onClicked={() => connect(ap)}
+                >
+                  <box>
+                    <image iconName={createBinding(ap, "iconName")} />
+                    <label label={ap.ssid} halign={START} hexpand />
+                    {ap.requiresPassword && (
+                      <image class="lock" iconName={Icons.lock} />
+                    )}
+                  </box>
+                </button>
+              )}
+            </For>
+          </box>
+        </scrolledwindow>
       </box>
     );
   }

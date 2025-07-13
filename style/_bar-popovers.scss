@@ -51,7 +51,7 @@ popover .big-toggle {
   --accent: var(--tertiary-dim);
 
   .access-points {
-    > button {
+    .access-point-button {
       padding: 0.5em;
     }
     image {
