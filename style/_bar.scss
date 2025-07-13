@@ -67,25 +67,26 @@
   }
 }
 
-.hider {
-  @include looks.transition;
-
-  opacity: 0.7;
-  color: var(--tertiary-dim);
-
-  &.open {
+.hider-wrapper {
+  .hider {
+    @include looks.transition;
+    opacity: 0.7;
+    color: var(--tertiary-dim);
+  }
+  &:checked .hider {
     -gtk-icon-transform: rotate(-90deg);
     opacity: 0.5;
   }
-}
-.hider-wrapper.non-empty .indicator {
-  min-width: 0.25em;
-  min-height: 0.25em;
-  margin: 0.85rem 0;
 
-  border-radius: 64px;
-  background-color: var(--tertiary-dim);
-  opacity: 0.7;
+  &.non-empty .indicator {
+    min-width: 0.25em;
+    min-height: 0.25em;
+    margin: 0.85rem 0;
+
+    border-radius: 64px;
+    background-color: var(--tertiary-dim);
+    opacity: 0.7;
+  }
 }
 
 .colorpicker {
