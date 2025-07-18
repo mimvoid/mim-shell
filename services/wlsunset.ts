@@ -14,9 +14,12 @@ export default class WlSunset extends GObject.Object {
 
   constructor() {
     super();
+
+    // Use pidof's error code to see if wlsunset is running.
     try {
-      this.#running = exec("pidof wlsunset") !== null;
-    } catch (err) {
+      exec("pidof -q wlsunset");
+      this.#running = true;
+    } catch (_) {
       this.#running = false;
     }
   }
