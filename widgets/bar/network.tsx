@@ -1,5 +1,4 @@
 import { createBinding } from "ags";
-import { execAsync } from "ags/process";
 import Network from "gi://AstalNetwork";
 
 import HoverRevealer from "@lib/widgets/HoverRevealer";
@@ -10,9 +9,8 @@ export default () => {
   const network = Network.get_default();
 
   const Icon = (
-    <button
+    <image
       $={pointer}
-      onClicked={() => execAsync("networkmanager_dmenu")}
       tooltipText={createBinding(network.wifi, "strength").as((i) => `${i}%`)}
       iconName={createBinding(network.wifi, "iconName")}
     />

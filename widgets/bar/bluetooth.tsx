@@ -1,11 +1,9 @@
 import { createBinding } from "ags";
-import { execAsync } from "ags/process";
 import Bluetooth from "gi://AstalBluetooth";
 
 import BluetoothPopover from "../popovers/bluetooth";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
 import Icon from "@lib/icons";
-import { pointer } from "@lib/utils";
 
 const bluetooth = Bluetooth.get_default();
 
@@ -16,11 +14,9 @@ function Indicator() {
   );
 
   return (
-    <button
-      $={pointer}
-      tooltipText={state((s) => "Bluetooth " + s)}
+    <image
       iconName={state((s) => Icon.bluetooth[s])}
-      onClicked={() => execAsync("rfkill toggle bluetooth")}
+      tooltipText={state((s) => "Bluetooth " + s)}
     />
   );
 }

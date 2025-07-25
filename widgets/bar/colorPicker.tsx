@@ -4,7 +4,6 @@ import { Gtk, Gdk } from "ags/gtk4";
 import Picker from "@services/colorpicker";
 import HoverRevealer from "@lib/widgets/HoverRevealer";
 import Icons from "@lib/icons";
-import { pointer } from "@lib/utils";
 import ColorsPopover from "../popovers/colors";
 
 export default () => {
@@ -14,10 +13,8 @@ export default () => {
   );
 
   const Trigger = (
-    <button
-      $={pointer}
-      class="color-button"
-      onClicked={() => picker.pick()}
+    <image
+      class="color-icon"
       tooltipText={lastColor((c) => "Last color: " + c)}
       iconName={Icons.colorpicker}
     />

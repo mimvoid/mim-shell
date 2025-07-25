@@ -89,6 +89,14 @@
   }
 }
 
+.colorpicker,
+.network,
+.bluetooth {
+  > button image {
+    padding: 0 0.4em;
+  }
+}
+
 .colorpicker {
   color: var(--primary-dim);
 
