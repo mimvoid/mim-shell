@@ -58,8 +58,8 @@ export default class Backlight extends GObject.Object {
     this.#percentage = percent;
     this.notify("percentage");
 
-    execAsync(`brightnessctl set ${Math.trunc(percent * 100)}% -q`).catch(
-      console.error,
-    );
+    execAsync(
+      `brightnessctl set ${Math.trunc(percent * 100)}% --device=${this.#name} --quiet`,
+    ).catch(console.error);
   }
 }
