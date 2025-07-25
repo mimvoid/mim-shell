@@ -30,11 +30,20 @@ export default () => {
       singleClickActivate
       orientation={Gtk.Orientation.HORIZONTAL}
       onActivate={async (self, position) => {
-        const file = self.model.get_item(position);
-        if (file instanceof Gio.FileInfo) {
-          Wallpapers.setWallpaper(
-            Wallpapers.directory + file.get_display_name(),
-          );
+        const fileInfo = self.model.get_item(position);
+
+        if (fileInfo instanceof Gio.FileInfo) {
+          const file = fileInfo.get_attribute_object("standard::file");
+          const path = (file as Gio.File).get_path();
+
+          if (path) {
+            Wallpapers.setWallpaper(path);
+          } else {
+            console.error(
+              "Could not get the path for file: ",
+              fileInfo.get_display_name(),
+            );
+          }
         }
       }}
       onDestroy={(self) => {
