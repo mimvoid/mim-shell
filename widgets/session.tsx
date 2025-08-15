@@ -47,14 +47,14 @@ function Session() {
 
 export default () => (
   <window
-    $={(self) =>
+    $={(self) => {
       setLayerrules(self.namespace, [
         "animation popin 75%",
         "blur",
         "ignorezero",
         "xray 0",
-      ])
-    }
+      ]);
+    }}
     name="session"
     namespace="session"
     class="session transparent"

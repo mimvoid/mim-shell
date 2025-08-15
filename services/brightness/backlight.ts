@@ -15,7 +15,8 @@ export default class Backlight extends GObject.Object {
   static new_from_brightnessctl(info: string) {
     const [name, _class, _value, percentStr, max] = GLib.strsplit(info, ",", 5);
 
-    const percentage = Number(percentStr.substring(0, percentStr.length - 1)) / 100;
+    const percentage =
+      Number(percentStr.substring(0, percentStr.length - 1)) / 100;
     return new Backlight(name, percentage, Number(max));
   }
 

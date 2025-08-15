@@ -77,9 +77,9 @@ export default () => {
   }
 
   bluetooth.devices.forEach(addWidget);
-  const addId = bluetooth.connect("device-added", (_, device) =>
-    addWidget(device),
-  );
+  const addId = bluetooth.connect("device-added", (_, device) => {
+    addWidget(device);
+  });
   onCleanup(() => bluetooth.disconnect(addId));
 
   return { ConnectedBox, DisconnectedBox, isConnected };

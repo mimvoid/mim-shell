@@ -69,14 +69,14 @@ export default () => {
     <For each={monitors} cleanup={(win) => (win as Gtk.Window).destroy()}>
       {(monitor) => (
         <window
-          $={(self) =>
+          $={(self) => {
             setLayerrules(self.namespace, [
               "blur",
               "blurpopups",
               "ignorezero",
               "xray 0",
             ])
-          }
+          }}
           name="bar"
           namespace="bar"
           class="bar transparent"

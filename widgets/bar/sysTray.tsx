@@ -8,9 +8,9 @@ const TrayItem = (item: Tray.TrayItem) => (
   <menubutton
     $={(self) => {
       self.insert_action_group("dbusmenu", item.action_group);
-      item.connect("notify::action-group", (itemSrc) =>
-        self.insert_action_group("dbusMenu", itemSrc.action_group),
-      );
+      item.connect("notify::action-group", (itemSrc) => {
+        self.insert_action_group("dbusMenu", itemSrc.action_group);
+      });
     }}
     class="system-tray-item"
     tooltipMarkup={createBinding(item, "tooltipMarkup")}

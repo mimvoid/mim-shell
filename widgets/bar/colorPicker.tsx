@@ -9,7 +9,7 @@ import ColorsPopover from "../popovers/colors";
 export default () => {
   const picker = Picker.get_default();
   const lastColor = createBinding(picker, "colors").as(
-    (c) => c.at(-1) || "#000000",
+    (c) => c.at(-1) ?? "#000000",
   );
 
   const Trigger = (

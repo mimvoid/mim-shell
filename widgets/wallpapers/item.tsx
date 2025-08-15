@@ -31,7 +31,7 @@ export default class WallpaperItem extends Astal.Box {
     const thumbnail = fileInfo.get_attribute_byte_string("thumbnail::path");
 
     this.picture.set_file(
-      Gio.File.new_for_path(thumbnail || Wallpapers.directory + displayName),
+      Gio.File.new_for_path(thumbnail ?? Wallpapers.directory + displayName),
     );
     this.label.set_text(displayName);
   }

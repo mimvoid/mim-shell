@@ -24,9 +24,9 @@ export default (player: Mpris.Player) => {
     <slider
       $={pointer}
       value={progress}
-      onChangeValue={({ value }) =>
-        void (player.position = value * player.length)
-      }
+      onChangeValue={({ value }) => {
+        player.position = value * player.length;
+      }}
       hexpand
     />
   );

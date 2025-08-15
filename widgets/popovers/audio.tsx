@@ -39,7 +39,7 @@ function Section(endpoint: Wp.Endpoint, name: string) {
     <label
       class="description"
       label={createBinding(endpoint, "description").as(
-        (d) => d || endpoint.name || "",
+        (d) => d ?? endpoint.name ?? "",
       )}
       halign={START}
       hexpand
@@ -53,7 +53,9 @@ function Section(endpoint: Wp.Endpoint, name: string) {
         drawValuePercentage(self);
       }}
       value={createBinding(endpoint, "volume")}
-      onChangeValue={({ value }) => void (endpoint.volume = value)}
+      onChangeValue={({ value }) => {
+        endpoint.volume = value;
+      }}
       valign={CENTER}
       hexpand
     />

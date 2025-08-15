@@ -6,15 +6,17 @@ export function pointer(self: Gtk.Widget) {
   self.set_cursor_from_name("pointer");
 }
 
-function popConn(widget: Gtk.Widget) {
+function animatePop(widget: Gtk.Widget) {
   widget.add_css_class("pop");
   timeout(100, () => widget.remove_css_class("pop"));
 }
 export function popButton(button: Gtk.Button) {
-  button.connect("clicked", popConn);
+  button.connect("clicked", animatePop);
 }
-export function popMenuButton(mButton: Gtk.MenuButton) {
-  mButton.popover.connect("show", (popover) => popConn(popover.parent));
+export function popMenuButton(menuButton: Gtk.MenuButton) {
+  menuButton.popover.connect("show", (popover) => {
+    animatePop(popover.parent);
+  });
 }
 
 export function toPercentage(value: number) {
@@ -32,28 +34,29 @@ export function stepOnScroll(
   dy: number,
 ) {
   const slider = widget as Astal.Slider;
-  dy < 0 ? (slider.value += slider.step) : (slider.value -= slider.step);
+  const valueChange = dy < 0 ? slider.step : -slider.step;
+  slider.value += valueChange;
 }
 
 export function sendHyprlandBatch(batch: string[]) {
-  // Taken from epik-shell
-  let cmd = "";
+  const len = batch.length;
+  if (len === 0) return;
 
-  let snippet: string;
-  for (let i = 0, len = batch.length; i < len; i++) {
-    snippet = batch[i];
-    if (!snippet) continue;
+  let cmd = "[[BATCH]]/";
+
+  let keyword: string;
+  for (let i = 0; i < len; i++) {
+    keyword = batch[i];
+    if (keyword === "") continue;
 
     if (i === 0) {
-      cmd += "keyword " + snippet;
+      cmd += "keyword " + keyword;
     } else {
-      cmd += "; keyword " + snippet;
+      cmd += "; keyword " + keyword;
     }
   }
 
-  if (!!cmd) {
-    AstalHyprland.get_default().message("[[BATCH]]/" + cmd);
-  }
+  AstalHyprland.get_default().message(cmd);
 }
 
 export function setLayerrules(namespace: string, rules: string[]) {

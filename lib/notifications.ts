@@ -19,11 +19,11 @@ export function makeNotification({
   const notification = Gio.Notification.new(title);
   if (body) notification.set_body(body);
 
-  if (icon) {
+  if (icon instanceof Gio.Icon) {
+    notification.set_icon(icon);
+  } else if (icon) {
     try {
-      notification.set_icon(
-        icon instanceof Gio.Icon ? icon : Gio.Icon.new_for_string(icon),
-      );
+      notification.set_icon(Gio.Icon.new_for_string(icon));
     } catch (err) {
       console.error(err);
     }
@@ -41,7 +41,7 @@ export function sendSimpleNotification(title: string, body: string) {
   app.send_notification(null, notification);
 }
 
-export function sendNotification(props: NotificationProps, id?: string | null) {
+export function sendNotification(props: NotificationProps, id: string | null = null) {
   const notification = makeNotification(props);
-  app.send_notification(id || null, notification);
+  app.send_notification(id, notification);
 }

@@ -76,8 +76,8 @@ export default class Trash extends GObject.Object {
           } catch (err) {
             console.error(err);
           }
-        default:
           break;
+        default:
       }
     });
   }

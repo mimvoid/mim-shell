@@ -52,7 +52,7 @@ export default (n: Notifd.Notification) => {
       return <image class="app-icon" iconName={n.appIcon} />;
     }
     return (
-      makeImage() || (
+      makeImage() ?? (
         <image class="app-icon" iconName="dialog-information-symbolic" />
       )
     );
@@ -62,7 +62,7 @@ export default (n: Notifd.Notification) => {
     <box class="header">
       <label
         class="app-name"
-        label={n.appName || "Unknown"}
+        label={n.appName ?? "Unknown"}
         ellipsize={Pango.EllipsizeMode.END}
         halign={START}
         hexpand
@@ -74,7 +74,7 @@ export default (n: Notifd.Notification) => {
   // Create a button for each action if they exist
   function actionButtons() {
     const actions = n.get_actions();
-    if (!!actions[0])
+    if (actions[0])
       return (
         <box class="actions">
           {actions.map(({ label, id }) => (

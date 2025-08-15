@@ -20,7 +20,7 @@ export default (player: Mpris.Player) => {
   const Lyrics = (
     <scrolledwindow class="lyrics">
       <label
-        label={createBinding(player, "lyrics").as((l) => (l || "No lyrics"))}
+        label={createBinding(player, "lyrics").as((l) => l || "No lyrics")}
         justify={Gtk.Justification.LEFT}
         vexpand
         hexpand

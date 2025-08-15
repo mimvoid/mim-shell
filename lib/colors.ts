@@ -2,12 +2,12 @@ import { Gdk } from "ags/gtk4";
 
 export function newGdkRgba(value: string) {
   const gRgba = new Gdk.RGBA();
-  return gRgba.parse(value) ? gRgba : null;
+  if (gRgba.parse(value)) return gRgba;
 }
 
 export function hexToRgb(value: string) {
   const gRgba = newGdkRgba(value);
-  return gRgba ? gRgba.to_string() : null;
+  if (gRgba) return gRgba.to_string();
 }
 
 function asHex(n: number) {
@@ -25,7 +25,7 @@ export function gRgbaToHex(g: Gdk.RGBA) {
 
 export function rgbToHex(value: string) {
   const gRgba = newGdkRgba(value);
-  return gRgba ? gRgbaToHex(gRgba) : null;
+  if (gRgba) return gRgbaToHex(gRgba);
 }
 
 export function gRgbaToHsl({ red, green, blue, alpha }: Gdk.RGBA) {
@@ -67,5 +67,5 @@ export function gRgbaToHsl({ red, green, blue, alpha }: Gdk.RGBA) {
 
 export function hexToHsl(value: string) {
   const gRgba = newGdkRgba(value);
-  return gRgba ? gRgbaToHsl(gRgba) : null;
+  if (gRgba) return gRgbaToHsl(gRgba);
 }

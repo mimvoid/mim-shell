@@ -36,9 +36,9 @@ export default () => {
 
   return (
     <window
-      $={(self) =>
-        setLayerrules(self.namespace, ["blur", "ignorezero", "xray 0"])
-      }
+      $={(self) => {
+        setLayerrules(self.namespace, ["blur", "ignorezero", "xray 0"]);
+      }}
       name="wallpaperPicker"
       namespace="wallpaper-picker"
       class="wallpaper-picker transparent"

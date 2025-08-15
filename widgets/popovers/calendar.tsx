@@ -11,7 +11,7 @@ const { START, CENTER, END } = Gtk.Align;
 const { VERTICAL } = Gtk.Orientation;
 
 function fmt(format: string) {
-  return (dt: GLib.DateTime) => dt.format(format) || "";
+  return (dt: GLib.DateTime) => dt.format(format) ?? "";
 }
 
 function Time() {
@@ -75,7 +75,7 @@ function CalendarWidget() {
   });
 
   const month = createBinding(Cal, "month").as(
-    () => Cal.get_date().format("%B") || "",
+    () => Cal.get_date().format("%B") ?? "",
   );
   const year = createBinding(Cal, "year").as((y) => String(y));
 
@@ -128,11 +128,12 @@ function CalendarWidget() {
   );
 }
 
-export default () => (
-  <PopRevealer name="calendar" hasArrow={false}>
-    <box class="calendar" halign={CENTER} orientation={VERTICAL}>
-      <Time />
-      <CalendarWidget />
-    </box>
-  </PopRevealer>
-) as Gtk.Popover;
+export default () =>
+  (
+    <PopRevealer name="calendar" hasArrow={false}>
+      <box class="calendar" halign={CENTER} orientation={VERTICAL}>
+        <Time />
+        <CalendarWidget />
+      </box>
+    </PopRevealer>
+  ) as Gtk.Popover;
