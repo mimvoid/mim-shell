@@ -82,6 +82,7 @@ export default () => {
           class="bar transparent"
           gdkmonitor={monitor}
           exclusivity={Astal.Exclusivity.EXCLUSIVE}
+          layer={Astal.Layer.BACKGROUND}
           anchor={TOP | LEFT | RIGHT}
           marginTop={3}
           marginRight={12}
