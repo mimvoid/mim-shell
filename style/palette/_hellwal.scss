@@ -1,14 +1,14 @@
 @use "sass:color";
 
 :root {
-  --base: hsl(from var(--background) h 30% 12% / 0.8);
+  --base: hsl(from var(--background) h 30% 8% / 0.8);
 
-  --box: hsl(from var(--background) h 25% 25% / 0.25);
-  --box-bright: hsl(from var(--background) h 25% 35% / 0.25);
-  --box-dim: hsl(from var(--background) h 25% 20% / 0.25);
+  --box: hsl(from var(--color8) h 30% 25% / 0.5);
+  --box-bright: hsl(from var(--color8) h 30% 35% / 0.5);
+  --box-dim: hsl(from var(--color8) h 30% 20% / 0.5);
 
   --string: var(--foreground);
-  --string-dim: hsl(from var(--foreground) h 5% calc(l - 40%));
+  --string-dim: hsl(from var(--foreground) h s calc(l - 40%));
 
   --shadow: hsl(from var(--color0) h s calc(l - 10%));
 
@@ -17,7 +17,7 @@
   --primary-dim: hsl(from var(--color13) h s 70%);
 
   --secondary: hsl(from var(--color11) h s 80%);
-  --secondary-bright: hsl(from var(--color11) h s 92%);
+  --secondary-bright: hsl(from var(--color2) h s 92%);
   --secondary-dim: hsl(from var(--color13) h s 65%);
 
   --tertiary: hsl(from var(--color10) h s 75%);
