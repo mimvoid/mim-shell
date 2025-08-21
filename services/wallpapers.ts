@@ -11,15 +11,25 @@ import { Gtk } from "ags/gtk4";
 export default class Wallpapers extends GObject.Object {
   static instance: Wallpapers;
   static directory = GLib.get_user_config_dir() + "/wallpapers/";
+  static hellwalCss = GLib.get_user_cache_dir() + "/hellwal/colors.css";
 
   static get_default() {
     if (!this.instance) this.instance = new Wallpapers();
     return this.instance;
   }
 
+  static async loadHellwalCss() {
+    app.apply_css(Wallpapers.hellwalCss);
+  }
+
   static async setWallpaper(path: string) {
     execAsync(
-      "matugen image " + path + " -t scheme-rainbow --contrast 0.5 -q",
+      "hellwal --quiet --skip-term-colors --check-contrast -i " + path,
+    ).catch(console.error);
+
+    execAsync(
+      "swww img --transition-type grow --transition-pos 0.95,0.95 --transition-step 90 " +
+        path,
     ).catch(console.error);
   }
 
@@ -58,12 +68,8 @@ export default class Wallpapers extends GObject.Object {
     filter.add_mime_type("image/*");
     this.#wallpapers = Gtk.FilterListModel.new(this.#directoryList, filter);
 
-    monitorFile("./style/palette/_matugen.scss", async (_, e) => {
-      if (e !== Gio.FileMonitorEvent.CHANGED) return;
-
-      execAsync("sass ./style/style.scss /tmp/ags/style.css")
-        .then(() => app.apply_css("/tmp/ags/style.css", true))
-        .catch(console.error);
+    monitorFile(Wallpapers.hellwalCss, async (file, e) => {
+      if (e === Gio.FileMonitorEvent.CHANGED) app.apply_css(file);
     });
   }
 

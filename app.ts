@@ -2,6 +2,7 @@
 
 import app from "ags/gtk4/app";
 import style from "./style/style.scss"; // root stylesheet
+import WallpaperService from "./services/wallpapers";
 import { Bar, Notifications, SessionMenu, Wallpapers } from "./widgets"; // windows
 
 app.start({
@@ -9,6 +10,8 @@ app.start({
   iconTheme: "Adwaita",
 
   main() {
+    WallpaperService.loadHellwalCss();
+
     Bar();
     Notifications();
     SessionMenu();

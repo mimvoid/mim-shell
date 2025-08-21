@@ -1,43 +1,30 @@
 @use "sass:color";
-@use "/home/zinnia/.cache/hellwal/colors.scss" as c;
 
-$base: color.change(c.$background,
-  $alpha: 0.8,
-  $lightness: 12%,
-  $saturation: 30%);
+:root {
+  --base: hsl(from var(--background) h 30% 12% / 0.8);
 
-$box: color.change(c.$background,
-  $alpha: 0.25,
-  $lightness: 25%,
-  $saturation: 25%);
+  --box: hsl(from var(--background) h 25% 25% / 0.25);
+  --box-bright: hsl(from var(--background) h 25% 35% / 0.25);
+  --box-dim: hsl(from var(--background) h 25% 20% / 0.25);
 
-$box-bright: color.change(c.$background,
-  $alpha: 0.25,
-  $lightness: 35%,
-  $saturation: 25%);
+  --string: var(--foreground);
+  --string-dim: hsl(from var(--foreground) h 5% calc(l - 40%));
 
-$box-dim: color.change(c.$background,
-  $alpha: 0.25,
-  $lightness: 20%,
-  $saturation: 25%);
+  --shadow: hsl(from var(--color0) h s calc(l - 10%));
 
-$string: c.$foreground;
-$string-dim: color.change(color.adjust(c.$foreground, $lightness: -40%), $saturation: 5%);
+  --primary: hsl(from var(--color9) h s 85%);
+  --primary-bright: hsl(from var(--color11) h s 95%);
+  --primary-dim: hsl(from var(--color13) h s 70%);
 
-$shadow: color.adjust(c.$color0, $lightness: -10%);
+  --secondary: hsl(from var(--color11) h s 80%);
+  --secondary-bright: hsl(from var(--color11) h s 92%);
+  --secondary-dim: hsl(from var(--color13) h s 65%);
 
-$primary: color.change(c.$color9, $lightness: 85%);
-$primary-bright: color.change(c.$color11, $lightness: 95%);
-$primary-dim: color.change(c.$color13, $whiteness: 70%);
+  --tertiary: hsl(from var(--color10) h s 75%);
+  --tertiary-bright: hsl(from var(--color14) h s 85%);
+  --tertiary-dim: hsl(from var(--color12) h s 70%);
 
-$secondary: color.change(c.$color11, $lightness: 80%);
-$secondary-bright: color.change(c.$color11, $lightness: 92%);
-$secondary-dim: color.change(c.$color13, $lightness: 65%);
-
-$tertiary: color.change(c.$color10, $lightness: 75%);
-$tertiary-bright: color.change(c.$color14, $lightness: 85%);
-$tertiary-dim: color.change(c.$color12, $lightness: 70%);
-
-$good: $tertiary;
-$warn: $secondary;
-$error: $primary;
+  --good: var(--tertiary);
+  --warn: var(--secondary);
+  --error: var(--primary);
+}
