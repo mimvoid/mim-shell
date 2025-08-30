@@ -2,6 +2,7 @@ import { createBinding } from "ags";
 import { Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 
+import { pointer } from "@lib/utils";
 import Actions from "./Actions";
 import Progress from "./Progress";
 import Info from "./Info";
@@ -44,7 +45,7 @@ export default (player: Mpris.Player) => {
   return (
     <box orientation={VERTICAL}>
       {MediaStack}
-      <Gtk.StackSwitcher stack={MediaStack} class="no-labels" />
+      <Gtk.StackSwitcher $={pointer} stack={MediaStack} class="no-labels" />
     </box>
   );
 };
