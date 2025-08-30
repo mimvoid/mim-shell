@@ -26,9 +26,10 @@ function SliderHover() {
       value={createBinding(speaker, "volume")}
       valign={Gtk.Align.CENTER}
       hexpand
-    >
-      <Gtk.EventControllerScroll onScroll={stepOnScroll} />
-    </slider>
+      onChangeValue={(_, scroll, value) => {
+        if (scroll !== Gtk.ScrollType.NONE) speaker.volume = value;
+      }}
+    />
   );
 
   // Hitbox does not include the icon

@@ -53,8 +53,8 @@ function Section(endpoint: Wp.Endpoint, name: string) {
         drawValuePercentage(self);
       }}
       value={createBinding(endpoint, "volume")}
-      onChangeValue={({ value }) => {
-        endpoint.volume = value;
+      onChangeValue={(_, scroll, value) => {
+        if (scroll !== Gtk.ScrollType.NONE) endpoint.volume = value;
       }}
       valign={CENTER}
       hexpand

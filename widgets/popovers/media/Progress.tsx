@@ -24,8 +24,10 @@ export default (player: Mpris.Player) => {
     <slider
       $={pointer}
       value={progress}
-      onChangeValue={({ value }) => {
-        player.position = value * player.length;
+      onChangeValue={(_, scroll, value) => {
+        if (scroll !== Gtk.ScrollType.NONE) {
+          player.position = value * player.length;
+        }
       }}
       hexpand
     />

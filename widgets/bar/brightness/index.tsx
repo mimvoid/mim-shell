@@ -18,7 +18,9 @@ function BrightnessSlider(device: Backlight) {
       value={createBinding(device, "percentage")}
       valign={Gtk.Align.CENTER}
       hexpand
-      onChangeValue={({ value }) => void (device.percentage = value)}
+      onChangeValue={(_, scroll, value) => {
+        if (scroll !== Gtk.ScrollType.NONE) device.percentage = value;
+      }}
     />
   );
 
