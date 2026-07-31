@@ -28,7 +28,7 @@ export default class Wallpapers extends GObject.Object {
     ).catch(console.error);
 
     execAsync(
-      "swww img --transition-type grow --transition-pos 0.95,0.95 --transition-step 90 " +
+      "awww img --transition-type grow --transition-pos 0.95,0.95 --transition-step 90 " +
         path,
     ).catch(console.error);
   }
