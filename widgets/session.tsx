@@ -9,7 +9,7 @@ function Session() {
   const { START, END } = Gtk.Align;
   const actions = [
     ["lock", "hyprlock"],
-    ["logout", "hyprctl dispatch exit"],
+    ["logout", "hyprctl dispatch 'hl.dsp.exit()'"],
     ["reboot", "systemctl reboot"],
     ["shutdown", "systemctl poweroff"],
   ];
